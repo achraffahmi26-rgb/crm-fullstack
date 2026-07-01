@@ -1,0 +1,66 @@
+@startuml
+title Diagramme de composants - CRM
+
+package "Frontend React + Vite" {
+  [App Router] as App
+  [AuthProvider] as AuthProvider
+  [ProtectedRoute] as ProtectedRoute
+  [DashboardLayout] as Layout
+  [Pages CRUD\nSocietes, Clients, Leads,\nProduits, Commandes,\nFactures, Paiements, Taches] as PagesCrud
+  [Dashboard] as DashboardPage
+  [Reports] as ReportsPage
+  [Composants formulaires] as FormModals
+  [NotificationBell] as NotificationBell
+  [GlobalSearch] as Search
+  [invoiceExport] as InvoiceExport
+  [axiosClient] as Axios
+}
+
+package "Backend Node.js + Express" {
+  [app.js\nmiddlewares Express] as ExpressApp
+  [routes/index.js] as RoutesIndex
+  [authMiddleware] as AuthMiddleware
+  [Controllers] as Controllers
+  [Validations] as Validations
+  [Services] as Services
+  [generateToken] as GenerateToken
+  [connection.js] as Connection
+}
+
+database "MySQL" as MySQL
+
+App --> AuthProvider
+App --> ProtectedRoute
+ProtectedRoute --> Layout
+Layout --> PagesCrud
+Layout --> DashboardPage
+Layout --> ReportsPage
+Layout --> NotificationBell
+Layout --> Search
+PagesCrud --> FormModals
+PagesCrud --> InvoiceExport : factures
+AuthProvider --> Axios
+PagesCrud --> Axios
+DashboardPage --> Axios
+ReportsPage --> Axios
+NotificationBell --> Axios
+Search --> Axios
+
+Axios --> ExpressApp : HTTP JSON /api
+ExpressApp --> RoutesIndex
+RoutesIndex --> AuthMiddleware : routes protegees
+RoutesIndex --> Controllers
+Controllers --> Validations
+Controllers --> Services
+Controllers --> GenerateToken : auth
+AuthMiddleware --> Services : findUserById
+Services --> Connection
+Connection --> MySQL
+
+note right of RoutesIndex
+Routes montees: auth, users, companies,
+customers, contacts, leads, categories,
+products, inventory, orders, invoices,
+payments, tasks, dashboard, notifications.
+end note
+@enduml

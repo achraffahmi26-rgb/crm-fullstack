@@ -1,0 +1,82 @@
+@startgantt
+title Planning Gantt - Projet CRM Full-Stack\nJuillet - Aout 2026
+
+Project starts 2026-07-01
+saturday are closed
+sunday are closed
+
+printscale weekly
+
+-- Juillet 2026 : Analyse, conception et backend --
+[Analyse des besoins] starts 2026-07-01
+[Analyse des besoins] lasts 5 days
+[Analyse des besoins] is colored in LightBlue
+
+[Conception de la base de donnees] starts at [Analyse des besoins]'s end
+[Conception de la base de donnees] lasts 5 days
+[Conception de la base de donnees] is colored in LightBlue
+
+[Conception UML / Merise] starts 2026-07-08
+[Conception UML / Merise] lasts 6 days
+[Conception UML / Merise] is colored in LightBlue
+
+[Developpement du Backend] starts 2026-07-15
+[Developpement du Backend] lasts 8 days
+[Developpement du Backend] is colored in LightGreen
+
+[Authentification JWT] starts 2026-07-17
+[Authentification JWT] lasts 3 days
+[Authentification JWT] is colored in LightGreen
+
+[Developpement des modules CRM] starts at [Developpement du Backend]'s end
+[Developpement des modules CRM] lasts 10 days
+[Developpement des modules CRM] is colored in LightGreen
+
+-- Aout 2026 : Frontend, fonctionnalites et finalisation --
+[Developpement du Frontend] starts 2026-08-03
+[Developpement du Frontend] lasts 12 days
+[Developpement du Frontend] is colored in Wheat
+
+[Pagination / Tri / Filtres] starts 2026-08-10
+[Pagination / Tri / Filtres] lasts 4 days
+[Pagination / Tri / Filtres] is colored in Wheat
+
+[Recherche globale] starts at [Pagination / Tri / Filtres]'s end
+[Recherche globale] lasts 3 days
+[Recherche globale] is colored in Wheat
+
+[Tableau de bord] starts 2026-08-10
+[Tableau de bord] lasts 5 days
+[Tableau de bord] is colored in LightYellow
+
+[Notifications] starts at [Tableau de bord]'s end
+[Notifications] lasts 3 days
+[Notifications] is colored in LightYellow
+
+[Rapports] starts at [Tableau de bord]'s end
+[Rapports] lasts 4 days
+[Rapports] is colored in LightYellow
+
+[Generation PDF] starts 2026-08-17
+[Generation PDF] lasts 4 days
+[Generation PDF] is colored in LightYellow
+
+[Responsive Design] starts 2026-08-18
+[Responsive Design] lasts 5 days
+[Responsive Design] is colored in Wheat
+
+[Tests d'integration] starts 2026-08-24
+[Tests d'integration] lasts 4 days
+[Tests d'integration] is colored in LightCoral
+
+[Optimisation UI/UX] starts 2026-08-24
+[Optimisation UI/UX] lasts 5 days
+[Optimisation UI/UX] is colored in LightCoral
+
+[Documentation] starts 2026-08-26
+[Documentation] lasts 3 days
+[Documentation] is colored in Lavender
+
+[Livraison finale] happens 2026-08-31
+[Livraison finale] is colored in LightGreen
+@endgantt

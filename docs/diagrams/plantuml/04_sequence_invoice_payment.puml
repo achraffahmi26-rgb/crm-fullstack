@@ -1,0 +1,81 @@
+@startuml
+title Sequence - Facture et paiement
+actor "Utilisateur authentifie" as U
+participant "Pages Factures/Paiements\nReact" as Page
+participant "invoiceApi / paymentApi" as Api
+participant "Axios client" as Axios
+participant "authMiddleware" as Auth
+participant "invoiceController" as InvoiceController
+participant "invoiceService" as InvoiceService
+participant "paymentController" as PaymentController
+participant "paymentService" as PaymentService
+database "MySQL" as DB
+participant "notificationService" as Notif
+
+== Creation de facture ==
+U -> Page : Choisit une commande, dates facture/echeance
+Page -> Api : createInvoice(payload)
+Api -> Axios : POST /invoices + Bearer JWT
+Axios -> Auth : verifier JWT
+Auth -> DB : SELECT utilisateur par id
+DB --> Auth : utilisateur
+Auth -> InvoiceController : createInvoice(req, res)
+InvoiceController -> InvoiceService : createInvoice(body, req.user.id)
+InvoiceService -> DB : SELECT id,total_amount FROM orders
+alt commande inexistante
+  InvoiceService --> InvoiceController : erreur order_id does not exist
+  InvoiceController --> Page : 400
+else commande existe
+  InvoiceService -> DB : SELECT id FROM invoices WHERE order_id = ?
+  alt facture deja creee
+    InvoiceService --> InvoiceController : erreur doublon
+    InvoiceController --> Page : 400
+  else aucune facture
+    InvoiceService -> InvoiceService : Generer INV-YYYYMMDD-####
+    InvoiceService -> DB : INSERT invoices\npayment_status='Unpaid'
+    InvoiceService -> Notif : createNotificationSafely(...)
+    Notif -> DB : INSERT notifications
+    InvoiceService --> InvoiceController : facture
+    InvoiceController --> Page : 201 { invoice }
+  end
+end
+
+== Creation ou mise a jour de paiement ==
+U -> Page : Saisit paiement facture
+Page -> Api : createPayment(payload)
+Api -> Axios : POST /payments + Bearer JWT
+Axios -> Auth : verifier JWT
+Auth -> DB : SELECT utilisateur par id
+DB --> Auth : utilisateur
+Auth -> PaymentController : createPayment(req, res)
+PaymentController -> PaymentService : createPayment(body, req.user.id)
+PaymentService -> DB : BEGIN TRANSACTION
+PaymentService -> DB : SELECT facture
+alt facture inexistante
+  PaymentService -> DB : ROLLBACK
+  PaymentService --> PaymentController : erreur invoice_id does not exist
+  PaymentController --> Page : 400
+else facture existe
+  alt statut paiement = Completed
+    PaymentService -> DB : SUM paiements Completed
+    alt total depasse montant facture
+      PaymentService -> DB : ROLLBACK
+      PaymentService --> PaymentController : erreur total depasse
+      PaymentController --> Page : 400
+    else total accepte
+      PaymentService -> DB : INSERT payments
+      PaymentService -> DB : UPDATE invoices SET payment_status\nUnpaid / Partially Paid / Paid
+      PaymentService -> DB : COMMIT
+      PaymentService -> Notif : createNotificationSafely(...)
+      Notif -> DB : INSERT notifications
+      PaymentService --> PaymentController : paiement
+      PaymentController --> Page : 201 { payment }
+    end
+  else statut Pending ou Failed
+    PaymentService -> DB : INSERT payments
+    PaymentService -> DB : COMMIT
+    PaymentService --> PaymentController : paiement
+    PaymentController --> Page : 201 { payment }
+  end
+end
+@enduml

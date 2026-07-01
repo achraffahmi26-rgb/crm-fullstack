@@ -1,0 +1,231 @@
+@startuml
+title MCD Merise - CRM
+hide circle
+skinparam linetype ortho
+
+entity "ROLE" as ROLE {
+  *id
+  --
+  nom
+  description
+}
+
+entity "UTILISATEUR" as USER {
+  *id
+  --
+  role_id
+  prenom
+  nom
+  email
+  mot_de_passe
+  telephone
+  avatar
+  statut
+  derniere_connexion
+}
+
+entity "SOCIETE" as COMPANY {
+  *id
+  --
+  cree_par
+  nom
+  secteur
+  email
+  telephone
+  site_web
+  adresse
+  ville
+  pays
+}
+
+entity "CLIENT" as CUSTOMER {
+  *id
+  --
+  societe_id
+  affecte_a
+  prenom
+  nom
+  email
+  telephone
+  statut
+  adresse
+  notes
+}
+
+entity "CONTACT" as CONTACT {
+  *id
+  --
+  societe_id
+  prenom
+  nom
+  email
+  telephone
+  poste
+}
+
+entity "LEAD" as LEAD {
+  *id
+  --
+  societe_id
+  affecte_a
+  prenom
+  nom
+  email
+  telephone
+  source
+  statut
+  valeur_estimee
+  notes
+}
+
+entity "CATEGORIE" as CATEGORY {
+  *id
+  --
+  nom
+  description
+}
+
+entity "PRODUIT" as PRODUCT {
+  *id
+  --
+  categorie_id
+  nom
+  sku
+  code_barres
+  description
+  prix_achat
+  prix_vente
+  image
+  statut
+}
+
+entity "INVENTAIRE" as INVENTORY {
+  *id
+  --
+  produit_id
+  quantite
+  stock_minimum
+  entrepot
+}
+
+entity "COMMANDE" as ORDER {
+  *id
+  --
+  numero_commande
+  client_id
+  cree_par
+  date_commande
+  montant_total
+  statut
+  notes
+}
+
+entity "LIGNE_COMMANDE" as ORDER_ITEM {
+  *id
+  --
+  commande_id
+  produit_id
+  quantite
+  prix_unitaire
+  sous_total
+}
+
+entity "FACTURE" as INVOICE {
+  *id
+  --
+  commande_id
+  emise_par
+  numero_facture
+  date_facture
+  date_echeance
+  montant_total
+  statut_paiement
+}
+
+entity "PAIEMENT" as PAYMENT {
+  *id
+  --
+  facture_id
+  montant
+  methode_paiement
+  date_paiement
+  transaction_id
+  reference
+  statut
+}
+
+entity "TACHE" as TASK {
+  *id
+  --
+  affectee_a
+  creee_par
+  titre
+  description
+  priorite
+  statut
+  date_echeance
+}
+
+entity "NOTIFICATION" as NOTIFICATION {
+  *id
+  --
+  utilisateur_id
+  titre
+  message
+  type
+  est_lue
+}
+
+entity "ACTIVITE" as ACTIVITY {
+  *id
+  --
+  utilisateur_id
+  action
+  type_entite
+  entite_id
+  description
+}
+
+entity "PARAMETRES" as SETTINGS {
+  *id
+  --
+  nom_societe
+  email_societe
+  telephone_societe
+  adresse_societe
+  devise
+  fuseau_horaire
+}
+
+ROLE ||--o{ USER : possede
+USER ||--o{ COMPANY : cree
+COMPANY ||--o{ CUSTOMER : regroupe
+COMPANY ||--o{ CONTACT : contient
+COMPANY ||--o{ LEAD : contient
+USER |o--o{ CUSTOMER : est_affecte
+USER |o--o{ LEAD : est_affecte
+CATEGORY |o--o{ PRODUCT : classe
+PRODUCT ||--o| INVENTORY : stocke
+CUSTOMER ||--o{ ORDER : passe
+USER ||--o{ ORDER : cree
+ORDER ||--o{ ORDER_ITEM : contient
+PRODUCT ||--o{ ORDER_ITEM : compose
+ORDER ||--o| INVOICE : facture
+USER ||--o{ INVOICE : emet
+INVOICE ||--o{ PAYMENT : recoit
+USER |o--o{ TASK : affecte
+USER |o--o{ TASK : cree
+USER ||--o{ NOTIFICATION : recoit
+USER ||--o{ ACTIVITY : realise
+
+note bottom of ACTIVITY
+Table presente dans le schema.
+Le tableau de bord reconstruit les activites
+par requetes UNION, sans utiliser cette table.
+end note
+
+note bottom of SETTINGS
+Table presente dans le schema.
+Aucun route/controller/service trouve.
+end note
+@enduml

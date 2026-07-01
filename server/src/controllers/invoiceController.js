@@ -1,0 +1,72 @@
+const invoiceService = require('../services/invoiceService');
+const { validateCreateInvoice, validateUpdateInvoice } = require('../validations/invoiceValidation');
+
+async function getInvoices(req, res) {
+  try {
+    const invoices = await invoiceService.getAllInvoices();
+    return res.json({ invoices });
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to fetch invoices', error: error.message });
+  }
+}
+
+async function getInvoiceById(req, res) {
+  try {
+    const invoice = await invoiceService.getInvoiceById(req.params.id);
+    if (!invoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+    return res.json({ invoice });
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to fetch invoice', error: error.message });
+  }
+}
+
+async function createInvoice(req, res) {
+  const { errors, isValid } = validateCreateInvoice(req.body);
+  if (!isValid) {
+    return res.status(400).json({ errors });
+  }
+  try {
+    const invoice = await invoiceService.createInvoice(req.body, req.user.id);
+    return res.status(201).json({ invoice });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+}
+
+async function updateInvoice(req, res) {
+  const { errors, isValid } = validateUpdateInvoice(req.body);
+  if (!isValid) {
+    return res.status(400).json({ errors });
+  }
+  try {
+    const invoice = await invoiceService.updateInvoice(req.params.id, req.body);
+    if (!invoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+    return res.json({ invoice });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+}
+
+async function deleteInvoice(req, res) {
+  try {
+    const deleted = await invoiceService.deleteInvoice(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Invoice not found or cannot be deleted' });
+    }
+    return res.json({ message: 'Invoice deleted successfully' });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+}
+
+module.exports = {
+  getInvoices,
+  getInvoiceById,
+  createInvoice,
+  updateInvoice,
+  deleteInvoice,
+};

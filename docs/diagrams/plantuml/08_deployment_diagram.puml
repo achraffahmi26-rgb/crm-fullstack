@@ -1,0 +1,39 @@
+@startuml
+title Diagramme de deploiement - CRM
+
+node "Navigateur utilisateur" as Browser {
+  artifact "Application React\n(Vite build)" as ReactApp
+  storage "localStorage\ncrm_token, crm_user" as LocalStorage
+}
+
+node "Serveur frontend" as FrontendServer {
+  artifact "Assets statiques\nHTML/CSS/JS/images" as StaticAssets
+}
+
+node "Serveur API Node.js" as ApiServer {
+  artifact "Express app\n/api" as ExpressApp
+  artifact "JWT auth\nbcrypt, jsonwebtoken" as JwtAuth
+  artifact "Services CRM" as Services
+}
+
+database "Serveur MySQL" as MySQL {
+  artifact "Base CRM\nschema.sql" as Schema
+}
+
+ReactApp --> StaticAssets : charge
+ReactApp --> LocalStorage : lit/ecrit token et utilisateur
+ReactApp --> ExpressApp : HTTP JSON\nAuthorization Bearer
+ExpressApp --> JwtAuth : verifier JWT / hasher password
+ExpressApp --> Services
+Services --> MySQL : mysql2/promise
+
+note bottom of ApiServer
+Port backend configure par PORT.
+Le client actuel utilise http://localhost:5000/api.
+end note
+
+note bottom of MySQL
+Connexion configuree par DB_HOST, DB_PORT,
+DB_DATABASE, DB_USER, DB_PASSWORD.
+end note
+@enduml

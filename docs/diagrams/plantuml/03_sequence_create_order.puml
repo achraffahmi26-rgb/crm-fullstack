@@ -1,0 +1,58 @@
+@startuml
+title Sequence - Creation d'une commande
+actor "Utilisateur authentifie" as U
+participant "Page Commandes\nReact" as Page
+participant "orderApi" as Api
+participant "Axios client" as Axios
+participant "orderRoutes" as Routes
+participant "authMiddleware" as Auth
+participant "orderController" as Controller
+participant "orderValidation" as Validation
+participant "orderService" as Service
+database "MySQL" as DB
+participant "notificationService" as Notif
+
+U -> Page : Remplit le formulaire commande
+Page -> Page : Valide client, date, statut, lignes
+Page -> Api : createOrder(payload)
+Api -> Axios : POST /orders + Bearer JWT
+Axios -> Routes : Requete /api/orders
+Routes -> Auth : verifier JWT
+Auth -> DB : SELECT utilisateur par id
+DB --> Auth : utilisateur
+Auth --> Routes : req.user
+Routes -> Controller : createOrder(req, res)
+Controller -> Validation : validateCreateOrder(body)
+Validation --> Controller : valide / erreurs
+
+alt donnees invalides
+  Controller --> Axios : 400 { errors }
+  Axios --> Page : erreur
+else donnees valides
+  Controller -> Service : customerExists(customer_id)
+  Service -> DB : SELECT id FROM customers
+  DB --> Service : resultat
+  loop pour chaque ligne
+    Controller -> Service : productExists(product_id)
+    Service -> DB : SELECT id FROM products
+    DB --> Service : resultat
+  end
+  Controller -> Service : createOrder(body, req.user.id)
+  Service -> DB : BEGIN TRANSACTION
+  Service -> Service : Generer ORD-YYYYMMDD-####
+  Service -> Service : Calculer total = somme(qte * prix)
+  Service -> DB : INSERT orders
+  loop pour chaque ligne
+    Service -> DB : INSERT order_items
+  end
+  Service -> DB : COMMIT
+  Service -> DB : SELECT commande + lignes
+  DB --> Service : commande complete
+  Service -> Notif : createNotificationSafely(...)
+  Notif -> DB : INSERT notifications
+  Service --> Controller : commande
+  Controller --> Axios : 201 { order }
+  Axios --> Page : commande creee
+  Page -> Page : Recharge la liste
+end
+@enduml

@@ -1,0 +1,212 @@
+@startuml
+title Diagramme de classes - Domaine CRM
+skinparam classAttributeIconSize 0
+
+class Role {
+  id
+  name
+  description
+}
+
+class User {
+  id
+  role_id
+  first_name
+  last_name
+  email
+  password
+  phone
+  avatar
+  status
+  last_login
+}
+
+class Company {
+  id
+  name
+  industry
+  email
+  phone
+  website
+  address
+  city
+  country
+  created_by
+}
+
+class Customer {
+  id
+  company_id
+  assigned_to
+  first_name
+  last_name
+  email
+  phone
+  status
+  address
+  notes
+}
+
+class Contact {
+  id
+  company_id
+  first_name
+  last_name
+  email
+  phone
+  position
+}
+
+class Lead {
+  id
+  company_id
+  assigned_to
+  first_name
+  last_name
+  email
+  phone
+  source
+  status
+  estimated_value
+  notes
+}
+
+class Category {
+  id
+  name
+  description
+}
+
+class Product {
+  id
+  category_id
+  name
+  sku
+  barcode
+  description
+  purchase_price
+  selling_price
+  image
+  status
+}
+
+class Inventory {
+  id
+  product_id
+  quantity
+  minimum_stock
+  warehouse
+}
+
+class Order {
+  id
+  order_number
+  customer_id
+  created_by
+  order_date
+  total_amount
+  status
+  notes
+}
+
+class OrderItem {
+  id
+  order_id
+  product_id
+  quantity
+  unit_price
+  subtotal
+}
+
+class Invoice {
+  id
+  order_id
+  issued_by
+  invoice_number
+  invoice_date
+  due_date
+  total_amount
+  payment_status
+}
+
+class Payment {
+  id
+  invoice_id
+  amount
+  payment_method
+  payment_date
+  transaction_id
+  reference
+  status
+}
+
+class Task {
+  id
+  assigned_to
+  created_by
+  title
+  description
+  priority
+  status
+  due_date
+}
+
+class Notification {
+  id
+  user_id
+  title
+  message
+  type
+  is_read
+}
+
+class Activity {
+  id
+  user_id
+  action
+  entity_type
+  entity_id
+  description
+}
+
+class Settings {
+  id
+  company_name
+  company_email
+  company_phone
+  company_address
+  currency
+  timezone
+}
+
+Role "1" -- "0..*" User
+User "1" -- "0..*" Company : cree
+Company "1" -- "0..*" Customer
+Company "1" -- "0..*" Contact
+Company "1" -- "0..*" Lead
+User "0..1" -- "0..*" Customer : affecte
+User "0..1" -- "0..*" Lead : affecte
+Category "0..1" -- "0..*" Product
+Product "1" -- "0..1" Inventory
+Customer "1" -- "0..*" Order
+User "1" -- "0..*" Order : cree
+Order "1" -- "1..*" OrderItem
+Product "1" -- "0..*" OrderItem
+Order "1" -- "0..1" Invoice
+User "1" -- "0..*" Invoice : emet
+Invoice "1" -- "0..*" Payment
+User "0..1" -- "0..*" Task : affecte
+User "0..1" -- "0..*" Task : cree
+User "1" -- "0..*" Notification
+User "1" -- "0..*" Activity
+
+note right of Activity
+Classe issue du schema SQL.
+Non utilisee par les services actuels.
+end note
+
+note right of Settings
+Classe issue du schema SQL.
+Non exposee par les routes actuelles.
+end note
+@enduml

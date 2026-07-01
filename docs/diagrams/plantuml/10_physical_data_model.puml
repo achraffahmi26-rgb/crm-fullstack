@@ -1,0 +1,253 @@
+@startuml
+title Modele physique de donnees - CRM
+hide circle
+skinparam linetype ortho
+
+entity "roles" as roles {
+  * id : int <<PK>>
+  --
+  name : varchar(50) <<UNIQUE>>
+  description : varchar(255)
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "users" as users {
+  * id : int <<PK>>
+  --
+  role_id : int <<FK>>
+  first_name : varchar(100)
+  last_name : varchar(100)
+  email : varchar(150) <<UNIQUE>>
+  password : varchar(255)
+  phone : varchar(20)
+  avatar : varchar(255)
+  status : enum('Active','Inactive')
+  last_login : datetime
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "companies" as companies {
+  * id : int <<PK>>
+  --
+  name : varchar(255)
+  industry : varchar(100)
+  email : varchar(150)
+  phone : varchar(50)
+  website : varchar(255)
+  address : text
+  city : varchar(100)
+  country : varchar(100)
+  created_by : int <<FK>>
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "customers" as customers {
+  * id : int <<PK>>
+  --
+  company_id : int <<FK>>
+  assigned_to : int <<FK>>
+  first_name : varchar(100)
+  last_name : varchar(100)
+  email : varchar(150) <<UNIQUE>>
+  phone : varchar(50)
+  status : varchar(50)
+  address : varchar(255)
+  notes : text
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "contacts" as contacts {
+  * id : int <<PK>>
+  --
+  company_id : int <<FK>>
+  first_name : varchar(100)
+  last_name : varchar(100)
+  email : varchar(150)
+  phone : varchar(50)
+  position : varchar(100)
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "leads" as leads {
+  * id : int <<PK>>
+  --
+  company_id : int <<FK>>
+  assigned_to : int <<FK>>
+  first_name : varchar(100)
+  last_name : varchar(100)
+  email : varchar(150)
+  phone : varchar(50)
+  source : varchar(100)
+  status : enum('New','Contacted','Qualified','Proposal','Won','Lost')
+  estimated_value : decimal(12,2)
+  notes : text
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "categories" as categories {
+  * id : int <<PK>>
+  --
+  name : varchar(100) <<UNIQUE>>
+  description : text
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "products" as products {
+  * id : int <<PK>>
+  --
+  category_id : int <<FK>>
+  name : varchar(150)
+  sku : varchar(50) <<UNIQUE>>
+  barcode : varchar(100) <<UNIQUE>>
+  description : text
+  purchase_price : decimal(10,2)
+  selling_price : decimal(10,2)
+  image : varchar(255)
+  status : enum('Active','Inactive')
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "inventory" as inventory {
+  * id : int <<PK>>
+  --
+  product_id : int <<FK, UNIQUE>>
+  quantity : int
+  minimum_stock : int
+  warehouse : varchar(100)
+  updated_at : datetime
+}
+
+entity "orders" as orders {
+  * id : int <<PK>>
+  --
+  order_number : varchar(50) <<UNIQUE>>
+  customer_id : int <<FK>>
+  created_by : int <<FK>>
+  order_date : datetime
+  total_amount : decimal(12,2)
+  status : enum('Pending','Confirmed','Processing','Completed','Cancelled')
+  notes : text
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "order_items" as order_items {
+  * id : int <<PK>>
+  --
+  order_id : int <<FK>>
+  product_id : int <<FK>>
+  quantity : int
+  unit_price : decimal(10,2)
+  subtotal : decimal(12,2)
+}
+
+entity "invoices" as invoices {
+  * id : int <<PK>>
+  --
+  order_id : int <<FK>>
+  issued_by : int <<FK>>
+  invoice_number : varchar(100) <<UNIQUE>>
+  invoice_date : date
+  due_date : date
+  total_amount : decimal(12,2)
+  payment_status : enum('Unpaid','Partially Paid','Paid')
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "payments" as payments {
+  * id : int <<PK>>
+  --
+  invoice_id : int <<FK>>
+  amount : decimal(12,2)
+  payment_method : enum('Cash','Credit Card','Bank Transfer')
+  payment_date : datetime
+  transaction_id : varchar(150)
+  reference : varchar(150)
+  status : enum('Pending','Completed','Failed')
+  created_at : datetime
+}
+
+entity "tasks" as tasks {
+  * id : int <<PK>>
+  --
+  assigned_to : int <<FK>>
+  created_by : int <<FK>>
+  title : varchar(255)
+  description : text
+  priority : enum('Low','Medium','High')
+  status : enum('Pending','In Progress','Completed')
+  due_date : date
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "notifications" as notifications {
+  * id : int <<PK>>
+  --
+  user_id : int <<FK>>
+  title : varchar(255)
+  message : text
+  type : enum('Info','Success','Warning','Error')
+  is_read : boolean
+  created_at : datetime
+}
+
+entity "activities" as activities {
+  * id : int <<PK>>
+  --
+  user_id : int <<FK>>
+  action : varchar(150)
+  entity_type : enum('Customer','Lead','Order','Invoice','Product','Task')
+  entity_id : int
+  description : text
+  created_at : datetime
+}
+
+entity "settings" as settings {
+  * id : int <<PK>>
+  --
+  company_name : varchar(255)
+  company_email : varchar(150)
+  company_phone : varchar(50)
+  company_address : text
+  currency : varchar(10)
+  timezone : varchar(100)
+  created_at : datetime
+  updated_at : datetime
+}
+
+roles ||--o{ users : users_role_id_fk
+users ||--o{ companies : companies_created_by_fk
+companies ||--o{ customers : customers_company_id_fk
+users |o--o{ customers : customers_assigned_to_fk
+companies ||--o{ contacts : contacts_company_id_fk
+companies ||--o{ leads : leads_company_id_fk
+users |o--o{ leads : leads_assigned_to_fk
+categories |o--o{ products : products_category_id_fk
+products ||--o| inventory : inventory_product_id_fk
+customers ||--o{ orders : orders_customer_id_fk
+users ||--o{ orders : orders_created_by_fk
+orders ||--o{ order_items : order_items_order_id_fk
+products ||--o{ order_items : order_items_product_id_fk
+orders ||--o{ invoices : invoices_order_id_fk
+users ||--o{ invoices : invoices_issued_by_fk
+invoices ||--o{ payments : payments_invoice_id_fk
+users |o--o{ tasks : tasks_assigned_to_fk
+users |o--o{ tasks : tasks_created_by_fk
+users ||--o{ notifications : notifications_user_id_fk
+users ||--o{ activities : activities_user_id_fk
+
+note right of invoices
+Le service impose une seule facture par commande,
+mais le schema SQL ne declare pas order_id UNIQUE.
+end note
+@enduml

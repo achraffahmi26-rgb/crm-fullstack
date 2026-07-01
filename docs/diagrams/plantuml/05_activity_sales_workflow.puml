@@ -1,0 +1,65 @@
+@startuml
+title Activite - Workflow commercial implemente
+start
+
+:Utilisateur s'inscrit ou se connecte;
+if (JWT valide ?) then (oui)
+  :Acces a l'espace CRM protege;
+else (non)
+  :Redirection vers /login ou erreur 401;
+  stop
+endif
+
+:Creer ou mettre a jour une societe;
+:Creer client et/ou lead rattache a une societe;
+
+fork
+  :Gerer le pipeline lead;
+  :Statuts lead: New, Contacted,\nQualified, Proposal, Won, Lost;
+fork again
+  :Gerer les produits;
+  :Associer une categorie si fournie;
+end fork
+
+:Creer une commande pour un client;
+:Ajouter une ou plusieurs lignes produit;
+:Calculer le total depuis les lignes;
+:Enregistrer commande et lignes en transaction;
+:Creer notification "Nouvelle commande";
+
+if (Facturer la commande ?) then (oui)
+  :Creer une facture depuis la commande;
+  if (Facture deja existante pour commande ?) then (oui)
+    :Refuser la creation;
+  else (non)
+    :Generer numero facture;
+    :Copier montant total de la commande;
+    :Statut paiement = Unpaid;
+    :Creer notification "Nouvelle facture";
+  endif
+else (non)
+endif
+
+if (Paiement recu ?) then (oui)
+  :Saisir paiement;
+  if (Statut paiement = Completed ?) then (oui)
+    :Verifier que le total paye ne depasse pas la facture;
+    if (Depassement ?) then (oui)
+      :Refuser paiement;
+    else (non)
+      :Enregistrer paiement;
+      :Recalculer statut facture;
+      :Unpaid / Partially Paid / Paid;
+      :Creer notification "Paiement complete";
+    endif
+  else (Pending ou Failed)
+    :Enregistrer paiement sans recalcul facture;
+  endif
+else (non)
+endif
+
+:Consulter tableau de bord et rapports;
+:Afficher statistiques, revenus mensuels,\nstatuts factures et activites recentes;
+
+stop
+@enduml

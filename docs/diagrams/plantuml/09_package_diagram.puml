@@ -1,0 +1,99 @@
+@startuml
+title Diagramme de packages - CRM
+
+package "client/src" {
+  package "pages" {
+    [Landing]
+    [Login]
+    [Register]
+    [Dashboard]
+    [Reports]
+    [CRUD Pages]
+  }
+
+  package "layouts" {
+    [AuthLayout]
+    [DashboardLayout]
+  }
+
+  package "components" {
+    [common]
+    [companies]
+    [customers]
+    [leads]
+    [products]
+    [orders]
+    [invoices]
+    [payments]
+    [tasks]
+  }
+
+  package "context" {
+    [AuthContext]
+    [AuthProvider]
+  }
+
+  package "api" {
+    [axiosClient]
+    [Module APIs]
+  }
+
+  package "routes" {
+    [ProtectedRoute]
+  }
+
+  package "utils" {
+    [tableUtils]
+    [invoiceExport]
+  }
+
+  [pages] ..> [layouts]
+  [pages] ..> [components]
+  [pages] ..> [api]
+  [pages] ..> [utils]
+  [layouts] ..> [api]
+  [layouts] ..> [context]
+  [routes] ..> [context]
+  [api] ..> [axiosClient]
+}
+
+package "server/src" {
+  package "routes" as ServerRoutes {
+    [Route Modules]
+  }
+  package "controllers" as ServerControllers {
+    [Controller Modules]
+  }
+  package "services" as ServerServices {
+    [Service Modules]
+  }
+  package "validations" as ServerValidations {
+    [Validation Modules]
+  }
+  package "middleware" as ServerMiddleware {
+    [authMiddleware]
+    [errorHandler]
+  }
+  package "database" as ServerDatabase {
+    [connection]
+    [schema.sql]
+  }
+  package "config" as ServerConfig {
+    [index]
+  }
+  package "utils" as ServerUtils {
+    [generateToken]
+  }
+
+  ServerRoutes ..> ServerMiddleware
+  ServerRoutes ..> ServerControllers
+  ServerControllers ..> ServerValidations
+  ServerControllers ..> ServerServices
+  ServerControllers ..> ServerUtils
+  ServerMiddleware ..> ServerServices
+  ServerServices ..> ServerDatabase
+  ServerDatabase ..> ServerConfig
+}
+
+[Module APIs] ..> ServerRoutes : HTTP /api
+@enduml
