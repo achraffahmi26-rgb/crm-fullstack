@@ -1,7 +1,9 @@
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AuthLayout from './layouts/AuthLayout';
+import AdminRoute from './routes/AdminRoute';
 import DashboardLayout from './layouts/DashboardLayout';
+import AccessDenied from './pages/AccessDenied';
 import Companies from './pages/Companies';
 import Customers from './pages/Customers';
 import Dashboard from './pages/Dashboard';
@@ -12,9 +14,9 @@ import Login from './pages/Login';
 import Orders from './pages/Orders';
 import Payments from './pages/Payments';
 import Products from './pages/Products';
-import Register from './pages/Register';
 import Reports from './pages/Reports';
 import Tasks from './pages/Tasks';
+import UsersPage from './pages/Users';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 function App() {
@@ -26,7 +28,7 @@ function App() {
 
         <Route element={<AuthLayout />}>
           <Route element={<Login />} path="/login" />
-          <Route element={<Register />} path="/register" />
+          <Route element={<Navigate to="/login" replace />} path="/register" />
         </Route>
 
         <Route element={<ProtectedRoute />}>
@@ -41,6 +43,10 @@ function App() {
             <Route element={<Payments />} path="/payments" />
             <Route element={<Tasks />} path="/tasks" />
             <Route element={<Reports />} path="/reports" />
+            <Route element={<AccessDenied />} path="/access-denied" />
+            <Route element={<AdminRoute />}>
+              <Route element={<UsersPage />} path="/users" />
+            </Route>
           </Route>
         </Route>
 

@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
   `id` int NOT NULL AUTO_INCREMENT,
   `company_id` int NOT NULL,
   `assigned_to` int DEFAULT NULL,
+  `created_by` int NOT NULL,
   `first_name` varchar(100) NOT NULL,
   `last_name` varchar(100) NOT NULL,
   `email` varchar(150) DEFAULT NULL,
@@ -78,8 +79,10 @@ CREATE TABLE IF NOT EXISTS `customers` (
   UNIQUE KEY `customers_email_unique` (`email`),
   KEY `customers_company_id_index` (`company_id`),
   KEY `customers_assigned_to_index` (`assigned_to`),
+  KEY `customers_created_by_index` (`created_by`),
   CONSTRAINT `customers_company_id_fk` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `customers_assigned_to_fk` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `customers_assigned_to_fk` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `customers_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `contacts` (
@@ -101,6 +104,7 @@ CREATE TABLE IF NOT EXISTS `leads` (
   `id` int NOT NULL AUTO_INCREMENT,
   `company_id` int NOT NULL,
   `assigned_to` int DEFAULT NULL,
+  `created_by` int NOT NULL,
   `first_name` varchar(100) NOT NULL,
   `last_name` varchar(100) NOT NULL,
   `email` varchar(150) DEFAULT NULL,
@@ -114,8 +118,10 @@ CREATE TABLE IF NOT EXISTS `leads` (
   PRIMARY KEY (`id`),
   KEY `leads_company_id_index` (`company_id`),
   KEY `leads_assigned_to_index` (`assigned_to`),
+  KEY `leads_created_by_index` (`created_by`),
   CONSTRAINT `leads_company_id_fk` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `leads_assigned_to_fk` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `leads_assigned_to_fk` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `leads_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `categories` (

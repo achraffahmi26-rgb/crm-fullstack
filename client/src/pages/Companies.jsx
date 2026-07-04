@@ -163,45 +163,45 @@ function Companies() {
   }
 
   return (
-    <div className="space-y-5">
-      <section className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+    <div className="crm-page-stack">
+      <section className="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
         <div className="min-w-0">
-          <p className="text-sm font-semibold uppercase tracking-wide text-crm-orange">Companies</p>
-          <h1 className="mt-2 text-2xl font-semibold text-crm-ink md:text-3xl">Company directory</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-crm-muted">
+          <p className="text-xs font-semibold uppercase tracking-wide text-crm-orange">Companies</p>
+          <h1 className="mt-1 text-xl font-semibold text-crm-ink md:text-2xl">Company directory</h1>
+          <p className="mt-1.5 max-w-2xl text-[13px] leading-5 text-crm-muted">
             Manage organizations, industries, and account contact details from one clean workspace.
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+        <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:justify-end">
           <button
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-crm-line bg-white px-4 text-sm font-semibold text-crm-muted hover:bg-crm-surface hover:text-crm-ink"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-crm-line bg-white px-3 text-[13px] font-semibold text-crm-muted hover:bg-crm-surface hover:text-crm-ink"
             onClick={loadCompanies}
             type="button"
           >
-            <RefreshCw size={17} />
+            <RefreshCw size={15} />
             Refresh
           </button>
           <button
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-crm-orange px-4 text-sm font-semibold text-white hover:bg-crm-orangeDark"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-crm-orange px-3 text-[13px] font-semibold text-white hover:bg-crm-orangeDark"
             onClick={openAddModal}
             type="button"
           >
-            <Plus size={17} />
+            <Plus size={15} />
             Add Company
           </button>
         </div>
       </section>
 
       <section className="rounded-lg border border-crm-line bg-white shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-crm-line p-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="rounded-md bg-orange-50 p-2 text-crm-orange">
-              <Building2 size={20} />
+        <div className="flex flex-col gap-2 border-b border-crm-line px-3.5 py-2.5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-md bg-orange-50 p-1.5 text-crm-orange">
+              <Building2 size={18} />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-crm-ink">All companies</h2>
-              <p className="text-sm text-crm-muted">
+              <h2 className="text-sm font-semibold text-crm-ink">All companies</h2>
+              <p className="text-[13px] text-crm-muted">
                 {table.filteredRows.length} of {companies.length} records
               </p>
             </div>
@@ -222,19 +222,19 @@ function Companies() {
         </div>
 
         {isLoading ? (
-          <div className="p-8">
-            <div className="space-y-3">
+          <div className="crm-table-loading">
+            <div className="space-y-2.5">
               {[1, 2, 3, 4].map((item) => (
-                <div className="h-12 animate-pulse rounded-md bg-crm-surface" key={item} />
+                <div className="crm-skeleton-row" key={item} />
               ))}
             </div>
           </div>
         ) : error ? (
-          <div className="p-8 text-center">
+          <div className="crm-table-error">
             <p className="text-sm font-semibold text-crm-ink">Could not load companies</p>
-            <p className="mt-2 text-sm text-crm-muted">{error}</p>
+            <p className="mt-1.5 text-[13px] text-crm-muted">{error}</p>
             <button
-              className="mt-4 rounded-md bg-crm-orange px-4 py-2 text-sm font-semibold text-white hover:bg-crm-orangeDark"
+              className="mt-3 rounded-md bg-crm-orange px-3 py-1.5 text-[13px] font-semibold text-white hover:bg-crm-orangeDark"
               onClick={loadCompanies}
               type="button"
             >
@@ -242,19 +242,19 @@ function Companies() {
             </button>
           </div>
         ) : table.filteredRows.length === 0 ? (
-          <div className="p-10 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-orange-50 text-crm-orange">
-              <Building2 size={22} />
+          <div className="crm-table-empty">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-md bg-orange-50 text-crm-orange">
+              <Building2 size={20} />
             </div>
-            <h3 className="mt-4 text-base font-semibold text-crm-ink">No companies found</h3>
-            <p className="mt-2 text-sm text-crm-muted">
+            <h3 className="mt-3 text-sm font-semibold text-crm-ink">No companies found</h3>
+            <p className="mt-1.5 text-[13px] text-crm-muted">
               {companies.length === 0 ? 'Add your first company to start organizing accounts.' : 'Adjust your search and try again.'}
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[1120px] w-full text-left">
-              <thead className="bg-crm-surface text-xs uppercase tracking-wide text-crm-muted">
+          <div className="crm-table-shell">
+            <table className="crm-table min-w-[1120px] w-full text-left">
+              <thead>
                 <tr>
                   <SortableHeader columnKey="name" onSort={table.toggleSort} sortConfig={table.sortConfig}>Name</SortableHeader>
                   <SortableHeader columnKey="industry" onSort={table.toggleSort} sortConfig={table.sortConfig}>Industry</SortableHeader>
@@ -264,20 +264,20 @@ function Companies() {
                   <SortableHeader columnKey="city" onSort={table.toggleSort} sortConfig={table.sortConfig}>City</SortableHeader>
                   <SortableHeader columnKey="country" onSort={table.toggleSort} sortConfig={table.sortConfig}>Country</SortableHeader>
                   <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
-                  <th className="px-4 py-3 text-right font-semibold">Actions</th>
+                  <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-crm-line text-sm">
+              <tbody>
                 {table.rows.map((company) => (
-                  <tr className="bg-white hover:bg-crm-surface/70" key={company.id}>
-                    <td className="px-4 py-4">
+                  <tr key={company.id}>
+                    <td>
                       <p className="font-semibold text-crm-ink">{getCompanyName(company)}</p>
                       <p className="text-xs text-crm-muted">ID #{company.id}</p>
                     </td>
-                    <td className="px-4 py-4 text-crm-muted">{company.industry || '-'}</td>
-                    <td className="px-4 py-4 text-crm-muted">{company.email || '-'}</td>
-                    <td className="px-4 py-4 text-crm-muted">{company.phone || '-'}</td>
-                    <td className="px-4 py-4 text-crm-muted">
+                    <td className="text-crm-muted">{company.industry || '-'}</td>
+                    <td className="text-crm-muted">{company.email || '-'}</td>
+                    <td className="text-crm-muted">{company.phone || '-'}</td>
+                    <td className="text-crm-muted">
                       {company.website ? (
                         <a
                           className="inline-flex items-center gap-1 text-crm-orange hover:underline"
@@ -292,27 +292,27 @@ function Companies() {
                         '-'
                       )}
                     </td>
-                    <td className="px-4 py-4 text-crm-muted">{company.city || '-'}</td>
-                    <td className="px-4 py-4 text-crm-muted">{company.country || '-'}</td>
-                    <td className="px-4 py-4 text-crm-muted">{formatDate(company.created_at)}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex justify-end gap-2">
+                    <td className="text-crm-muted">{company.city || '-'}</td>
+                    <td className="text-crm-muted">{company.country || '-'}</td>
+                    <td className="text-crm-muted">{formatDate(company.created_at)}</td>
+                    <td>
+                      <div className="flex justify-end gap-1">
                         <button
                           aria-label={`Edit ${getCompanyName(company)}`}
-                          className="rounded-md border border-crm-line p-2 text-crm-muted hover:bg-white hover:text-crm-ink"
+                          className="rounded-md border border-crm-line p-1 text-crm-muted hover:bg-white hover:text-crm-ink"
                           onClick={() => openEditModal(company)}
                           type="button"
                         >
-                          <Pencil size={16} />
+                          <Pencil size={14} />
                         </button>
                         <button
                           aria-label={`Delete ${getCompanyName(company)}`}
-                          className="rounded-md border border-red-100 p-2 text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="rounded-md border border-red-100 p-1 text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                           disabled={isDeleting === company.id}
                           onClick={() => handleDelete(company)}
                           type="button"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>

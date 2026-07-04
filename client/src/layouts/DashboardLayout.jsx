@@ -39,6 +39,7 @@ const navItems = [
   { label: 'Payments', to: '/payments', icon: CreditCard },
   { label: 'Tasks', to: '/tasks', icon: CheckSquare },
   { label: 'Reports', to: '/reports', icon: BarChart3 },
+  { label: 'Users', to: '/users', icon: Users, adminOnly: true },
 ];
 
 function safeString(value) {
@@ -475,7 +476,7 @@ function NotificationBell() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-crm-ink">{notification.title}</p>
+                            <p className="truncate text-[13px] font-semibold text-crm-ink">{notification.title}</p>
                             <p className="mt-1 line-clamp-2 text-xs leading-5 text-crm-muted">{notification.message}</p>
                           </div>
                           <button
@@ -615,8 +616,8 @@ function GlobalSearch() {
   const hasResults = groups.length > 0;
 
   return (
-    <div className="relative hidden w-64 md:block xl:w-80" ref={searchRef}>
-      <div className="flex h-10 items-center gap-2 rounded-md border border-crm-line bg-crm-surface px-3 text-sm text-crm-muted focus-within:border-crm-orange focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100">
+    <div className="relative hidden w-56 md:block xl:w-72" ref={searchRef}>
+      <div className="flex h-9 items-center gap-2 rounded-md border border-crm-line bg-crm-surface px-2.5 text-sm text-crm-muted focus-within:border-crm-orange focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100">
         <Search className="shrink-0" size={17} />
         <input
           aria-label="Search CRM records"
@@ -642,7 +643,7 @@ function GlobalSearch() {
       </div>
 
       {isOpen && hasQuery ? (
-        <div className="absolute left-0 top-full z-50 mt-2 max-h-[70vh] w-[min(28rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-crm-line bg-white shadow-xl">
+        <div className="absolute left-0 top-full z-50 mt-2 max-h-[68vh] w-[min(25rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-crm-line bg-white shadow-xl">
           {isLoading ? (
             <div className="p-4">
               <div className="h-3 w-28 animate-pulse rounded bg-crm-surface" />
@@ -678,7 +679,7 @@ function GlobalSearch() {
                         >
                           <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-crm-orange" />
                           <span className="min-w-0">
-                            <span className="block truncate text-sm font-semibold text-crm-ink">{result.title}</span>
+                            <span className="block truncate text-[13px] font-semibold text-crm-ink">{result.title}</span>
                             <span className="block truncate text-xs text-crm-muted">{result.subtitle}</span>
                           </span>
                         </button>
@@ -700,7 +701,7 @@ function GlobalSearch() {
   );
 }
 
-function Sidebar({ isOpen, onClose }) {
+function Sidebar({ isOpen, navItems, onClose }) {
   return (
     <>
       <div
@@ -710,25 +711,25 @@ function Sidebar({ isOpen, onClose }) {
         onClick={onClose}
       />
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-crm-line bg-white transition-transform lg:fixed lg:h-screen lg:max-w-none lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-56 max-w-[85vw] flex-col overflow-y-auto border-r border-crm-line bg-white transition-transform lg:fixed lg:h-screen lg:max-w-none lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-crm-line px-5">
-          <BrandLogo className="h-9 w-9" />
+        <div className="flex h-11 items-center justify-between border-b border-crm-line px-3">
+          <BrandLogo className="h-7 w-7" textClassName="text-sm leading-tight" />
           <button className="rounded-md p-2 text-crm-muted hover:bg-crm-surface lg:hidden" onClick={onClose} type="button">
             <X size={18} />
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-0.5 px-2 py-2.5">
           {navItems.map((item) => {
             const Icon = item.icon;
 
             return (
               <NavLink
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition ${
+                  `flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] font-medium transition ${
                     isActive
                       ? 'bg-orange-50 text-crm-orange'
                       : 'text-crm-muted hover:bg-crm-surface hover:text-crm-ink'
@@ -739,7 +740,7 @@ function Sidebar({ isOpen, onClose }) {
                 end={item.to === '/dashboard'}
                 to={item.to}
               >
-                <Icon size={18} />
+                <Icon size={16} />
                 {item.label}
               </NavLink>
             );
@@ -750,17 +751,22 @@ function Sidebar({ isOpen, onClose }) {
   );
 }
 
+function userIsAdmin(user) {
+  return user?.role_name === 'Admin' || Number(user?.role_id) === 1;
+}
+
 function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { logout, user } = useAuth();
+  const visibleNavItems = navItems.filter((item) => !item.adminOnly || userIsAdmin(user));
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-crm-surface text-crm-ink">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar isOpen={isSidebarOpen} navItems={visibleNavItems} onClose={() => setIsSidebarOpen(false)} />
 
-      <div className="min-w-0 lg:ml-72">
-        <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-3 border-b border-crm-line bg-white/95 px-3 py-3 backdrop-blur sm:px-4 md:px-6">
-          <div className="flex min-w-0 items-center gap-3">
+      <div className="min-w-0 lg:ml-56">
+        <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-2 border-b border-crm-line bg-white/95 px-3 py-2 backdrop-blur sm:px-4 md:px-5">
+          <div className="flex min-w-0 items-center gap-2">
             <button
               className="rounded-md border border-crm-line bg-white p-2 text-crm-muted hover:bg-crm-surface lg:hidden"
               onClick={() => setIsSidebarOpen(true)}
@@ -771,14 +777,14 @@ function DashboardLayout() {
             <GlobalSearch />
           </div>
 
-          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
             <NotificationBell />
             <div className="hidden min-w-0 text-right sm:block">
-              <p className="truncate text-sm font-semibold">{user?.first_name || 'User'} {user?.last_name || ''}</p>
-              <p className="max-w-44 truncate text-xs text-crm-muted">{user?.email}</p>
+              <p className="truncate text-[13px] font-semibold">{user?.first_name || 'User'} {user?.last_name || ''}</p>
+              <p className="max-w-40 truncate text-[11px] text-crm-muted">{user?.email}</p>
             </div>
             <button
-              className="shrink-0 rounded-md border border-crm-line bg-white px-3 py-2 text-sm font-medium text-crm-muted hover:bg-crm-surface hover:text-crm-ink"
+              className="shrink-0 rounded-md border border-crm-line bg-white px-2.5 py-1.5 text-xs font-medium text-crm-muted hover:bg-crm-surface hover:text-crm-ink"
               onClick={logout}
               type="button"
             >
@@ -787,8 +793,10 @@ function DashboardLayout() {
           </div>
         </header>
 
-        <main className="min-w-0 p-3 sm:p-4 md:p-6">
-          <Outlet />
+        <main className="min-w-0 p-2.5 sm:p-3 md:p-4 xl:p-5">
+          <div className="mx-auto w-full max-w-[1680px]">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

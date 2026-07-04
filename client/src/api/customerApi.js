@@ -23,7 +23,7 @@ export async function deleteCustomer(id) {
 export async function getCustomerFormOptions() {
   const [companiesResponse, usersResponse] = await Promise.all([
     axiosClient.get('/companies'),
-    axiosClient.get('/users'),
+    axiosClient.get('/users/assignees'),
   ]);
 
   return {

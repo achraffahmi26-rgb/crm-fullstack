@@ -2,7 +2,7 @@ const dashboardService = require('../services/dashboardService');
 
 async function getStats(req, res) {
   try {
-    const stats = await dashboardService.getStats();
+    const stats = await dashboardService.getStats(req.user);
     return res.json({ stats });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch dashboard stats', error: error.message });
@@ -11,7 +11,7 @@ async function getStats(req, res) {
 
 async function getRevenue(req, res) {
   try {
-    const revenue = await dashboardService.getRevenue();
+    const revenue = await dashboardService.getRevenue(req.user);
     return res.json({ revenue });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch dashboard revenue', error: error.message });
@@ -20,7 +20,7 @@ async function getRevenue(req, res) {
 
 async function getRecentActivities(req, res) {
   try {
-    const activities = await dashboardService.getRecentActivities();
+    const activities = await dashboardService.getRecentActivities(req.user);
     return res.json({ activities });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch recent activities', error: error.message });

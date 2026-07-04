@@ -11,6 +11,19 @@ async function getAllUsers() {
   return rows;
 }
 
+async function getAssignableUsers() {
+  const db = getDatabase();
+  const [rows] = await db.execute(
+    `SELECT users.id, users.first_name, users.last_name, users.email, roles.name AS role_name, users.status
+     FROM users
+     LEFT JOIN roles ON roles.id = users.role_id
+     WHERE users.status = ?
+     ORDER BY users.first_name ASC, users.last_name ASC, users.email ASC`,
+    ['Active']
+  );
+  return rows;
+}
+
 async function getUserById(id) {
   const db = getDatabase();
   const [rows] = await db.execute(
@@ -109,19 +122,27 @@ async function updateUser(id, data) {
   return getUserById(id);
 }
 
-async function deleteUser(id) {
+async function resetUserPassword(id, password) {
   const db = getDatabase();
-  await db.execute('DELETE FROM users WHERE id = ?', [id]);
+  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
+  await db.execute(
+    `UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+    [hashedPassword, id]
+  );
+
   return true;
 }
 
+
 module.exports = {
   getAllUsers,
+  getAssignableUsers,
   getUserById,
   findUserByEmail,
   emailExists,
   roleExists,
   createUser,
   updateUser,
-  deleteUser,
+  resetUserPassword,
 };

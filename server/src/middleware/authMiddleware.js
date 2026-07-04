@@ -17,6 +17,10 @@ async function authMiddleware(req, res, next) {
       return res.status(401).json({ message: 'Invalid token user' });
     }
 
+    if (user.status !== 'Active') {
+      return res.status(403).json({ message: 'Your account is inactive. Please contact an administrator.' });
+    }
+
     req.user = user;
     next();
   } catch (error) {

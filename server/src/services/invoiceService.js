@@ -1,5 +1,4 @@
 const { getDatabase } = require('../database/connection');
-
 const { createNotificationSafely } = require('./notificationService');
 
 const VALID_PAYMENT_STATUSES = ['Unpaid', 'Partially Paid', 'Paid'];
@@ -17,20 +16,78 @@ function generateInvoiceNumber() {
   return `INV-${year}${month}${day}-${randomSuffix}`;
 }
 
-async function getAllInvoices() {
+function isAdmin(user) {
+  return user?.role_name === 'Admin' || Number(user?.role_id) === 1;
+}
+
+const INVOICE_SELECT = `SELECT invoices.id, invoices.order_id, invoices.issued_by, invoices.invoice_number,
+        invoices.invoice_date, invoices.due_date, invoices.total_amount, invoices.payment_status,
+        invoices.created_at, invoices.updated_at,
+        orders.order_number, orders.created_by AS order_created_by, orders.customer_id,
+        CONCAT(customers.first_name, ' ', customers.last_name) AS customer_name,
+        customers.email AS customer_email,
+        customers.created_by AS customer_created_by,
+        customers.assigned_to AS customer_assigned_to,
+        CONCAT(issuer.first_name, ' ', issuer.last_name) AS issuer_user_name,
+        issuer.email AS issuer_user_email
+     FROM invoices
+     INNER JOIN orders ON orders.id = invoices.order_id
+     INNER JOIN customers ON customers.id = orders.customer_id
+     LEFT JOIN users issuer ON issuer.id = invoices.issued_by`;
+
+function appendInvoiceScope(query, params, user) {
+  if (isAdmin(user)) {
+    return { query, params };
+  }
+
+  const scope = '(invoices.issued_by = ? OR orders.created_by = ? OR customers.created_by = ? OR customers.assigned_to = ?)';
+  const scopedQuery = query.includes('WHERE') ? `${query} AND ${scope}` : `${query} WHERE ${scope}`;
+
+  return {
+    query: scopedQuery,
+    params: [...params, user.id, user.id, user.id, user.id],
+  };
+}
+
+async function getAllInvoices(user) {
   const db = getDatabase();
-  const [rows] = await db.execute('SELECT * FROM invoices ORDER BY created_at DESC');
+  const scoped = appendInvoiceScope(INVOICE_SELECT, [], user);
+  const [rows] = await db.execute(`${scoped.query} ORDER BY invoices.created_at DESC`, scoped.params);
   return rows;
 }
 
-async function getInvoiceById(id) {
+async function getInvoiceById(id, user) {
   const db = getDatabase();
-  const [invoices] = await db.execute('SELECT * FROM invoices WHERE id = ?', [id]);
-  if (invoices.length === 0) return null;
-  return invoices[0];
+  const scoped = appendInvoiceScope(`${INVOICE_SELECT} WHERE invoices.id = ?`, [id], user);
+  const [invoices] = await db.execute(scoped.query, scoped.params);
+  return invoices[0] || null;
 }
 
-async function createInvoice(data, userId) {
+async function orderExists(orderId) {
+  const db = getDatabase();
+  const [rows] = await db.execute('SELECT id FROM orders WHERE id = ?', [orderId]);
+  return rows.length > 0;
+}
+
+async function canUseOrder(orderId, user) {
+  const db = getDatabase();
+
+  if (isAdmin(user)) {
+    return orderExists(orderId);
+  }
+
+  const [rows] = await db.execute(
+    `SELECT orders.id
+     FROM orders
+     INNER JOIN customers ON customers.id = orders.customer_id
+     WHERE orders.id = ?
+       AND (orders.created_by = ? OR customers.created_by = ? OR customers.assigned_to = ?)`,
+    [orderId, user.id, user.id, user.id]
+  );
+  return rows.length > 0;
+}
+
+async function createInvoice(data, user) {
   const db = getDatabase();
   const [orders] = await db.execute('SELECT id, total_amount FROM orders WHERE id = ?', [data.order_id]);
   if (orders.length === 0) throw new Error('order_id does not exist');
@@ -43,19 +100,19 @@ async function createInvoice(data, userId) {
   const [result] = await db.execute(
     `INSERT INTO invoices (order_id, invoice_number, invoice_date, due_date, total_amount, issued_by, payment_status, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, 'Unpaid', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-    [data.order_id, invoice_number, data.invoice_date, data.due_date, total_amount, userId]
+    [data.order_id, invoice_number, data.invoice_date, data.due_date, total_amount, user.id]
   );
-  const invoice = await getInvoiceById(result.insertId);
+  const invoice = await getInvoiceById(result.insertId, user);
   createNotificationSafely({
     title: 'New invoice created',
     message: `Invoice ${invoice.invoice_number} was created for ${formatMoney(invoice.total_amount)}.`,
     type: 'Info',
-  }, userId);
+  }, user.id);
 
   return invoice;
 }
 
-async function updateInvoice(id, data) {
+async function updateInvoice(id, data, user) {
   const db = getDatabase();
   const updates = [];
   const params = [];
@@ -73,7 +130,7 @@ async function updateInvoice(id, data) {
   params.push(id);
   const [result] = await db.execute(`UPDATE invoices SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, params);
   if (result.affectedRows === 0) return null;
-  return getInvoiceById(id);
+  return getInvoiceById(id, user);
 }
 
 async function deleteInvoice(id) {
@@ -87,7 +144,10 @@ async function deleteInvoice(id) {
 module.exports = {
   getAllInvoices,
   getInvoiceById,
+  orderExists,
+  canUseOrder,
   createInvoice,
   updateInvoice,
   deleteInvoice,
+  isAdmin,
 };

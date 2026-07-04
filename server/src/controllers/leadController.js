@@ -3,7 +3,7 @@ const { validateCreateLead, validateUpdateLead } = require('../validations/leadV
 
 async function getLeads(req, res) {
   try {
-    const leads = await leadService.getAllLeads();
+    const leads = await leadService.getAllLeads(req.user);
     return res.json({ leads });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch leads', error: error.message });
@@ -12,7 +12,7 @@ async function getLeads(req, res) {
 
 async function getLeadById(req, res) {
   try {
-    const lead = await leadService.getLeadById(req.params.id);
+    const lead = await leadService.getLeadById(req.params.id, req.user);
     if (!lead) {
       return res.status(404).json({ message: 'Lead not found' });
     }
@@ -34,14 +34,14 @@ async function createLead(req, res) {
       return res.status(400).json({ message: 'company_id does not exist' });
     }
 
-    if (req.body.assigned_to !== undefined) {
-      const userExists = await leadService.userExists(req.body.assigned_to);
-      if (!userExists) {
-        return res.status(400).json({ message: 'assigned_to does not exist' });
+    if (leadService.isAdmin(req.user) && req.body.assigned_to !== undefined) {
+      const assignedExists = await leadService.activeUserExists(req.body.assigned_to);
+      if (!assignedExists) {
+        return res.status(400).json({ message: 'assigned_to active user does not exist' });
       }
     }
 
-    const lead = await leadService.createLead(req.body, req.user.id);
+    const lead = await leadService.createLead(req.body, req.user);
     return res.status(201).json({ lead });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to create lead', error: error.message });
@@ -55,7 +55,7 @@ async function updateLead(req, res) {
   }
 
   try {
-    const existingLead = await leadService.getLeadById(req.params.id);
+    const existingLead = await leadService.getLeadById(req.params.id, req.user);
     if (!existingLead) {
       return res.status(404).json({ message: 'Lead not found' });
     }
@@ -68,13 +68,19 @@ async function updateLead(req, res) {
     }
 
     if (req.body.assigned_to !== undefined) {
-      const userExists = await leadService.userExists(req.body.assigned_to);
-      if (!userExists) {
-        return res.status(400).json({ message: 'assigned_to does not exist' });
+      if (!leadService.isAdmin(req.user) && Number(req.body.assigned_to) !== Number(req.user.id)) {
+        return res.status(403).json({ message: 'Employees cannot reassign leads' });
+      }
+
+      if (leadService.isAdmin(req.user)) {
+        const assignedExists = await leadService.activeUserExists(req.body.assigned_to);
+        if (!assignedExists) {
+          return res.status(400).json({ message: 'assigned_to active user does not exist' });
+        }
       }
     }
 
-    const lead = await leadService.updateLead(req.params.id, req.body);
+    const lead = await leadService.updateLead(req.params.id, req.body, req.user);
     return res.json({ lead });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to update lead', error: error.message });
@@ -83,7 +89,7 @@ async function updateLead(req, res) {
 
 async function deleteLead(req, res) {
   try {
-    const existingLead = await leadService.getLeadById(req.params.id);
+    const existingLead = await leadService.getLeadById(req.params.id, req.user);
     if (!existingLead) {
       return res.status(404).json({ message: 'Lead not found' });
     }

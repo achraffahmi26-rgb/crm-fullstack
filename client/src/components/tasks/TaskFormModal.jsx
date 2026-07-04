@@ -26,7 +26,7 @@ function userLabel(user) {
   return name ? `${name}${user.email ? ` (${user.email})` : ''}` : user.email || `User #${user.id}`;
 }
 
-function validateForm(form, users) {
+function validateForm(form, users, canAssignUsers) {
   const errors = {};
   const userIds = new Set(users.map((user) => String(user.id)));
 
@@ -42,14 +42,14 @@ function validateForm(form, users) {
     errors.status = 'Choose a valid status';
   }
 
-  if (form.assigned_to && !userIds.has(form.assigned_to)) {
+  if (canAssignUsers && form.assigned_to && !userIds.has(form.assigned_to)) {
     errors.assigned_to = 'Choose a valid user';
   }
 
   return errors;
 }
 
-function toPayload(form) {
+function toPayload(form, canAssignUsers) {
   const payload = {
     title: form.title.trim(),
     description: form.description.trim() || null,
@@ -58,7 +58,7 @@ function toPayload(form) {
     due_date: form.due_date || null,
   };
 
-  if (form.assigned_to) {
+  if (canAssignUsers && form.assigned_to) {
     payload.assigned_to = Number(form.assigned_to);
   }
 
@@ -73,7 +73,7 @@ function FieldError({ children }) {
   return <p className="mt-1 text-xs font-medium text-red-600">{children}</p>;
 }
 
-function TaskFormModal({ isOpen, isSaving, onClose, onSubmit, task, users }) {
+function TaskFormModal({ canAssignUsers = false, isOpen, isSaving, onClose, onSubmit, task, users }) {
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(emptyForm);
 
@@ -121,13 +121,13 @@ function TaskFormModal({ isOpen, isSaving, onClose, onSubmit, task, users }) {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const nextErrors = validateForm(form, users);
+    const nextErrors = validateForm(form, users, canAssignUsers);
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
     }
 
-    await onSubmit(toPayload(form));
+    await onSubmit(toPayload(form, canAssignUsers));
   }
 
   return (
@@ -172,23 +172,25 @@ function TaskFormModal({ isOpen, isSaving, onClose, onSubmit, task, users }) {
               <FieldError>{errors.title}</FieldError>
             </label>
 
-            <label className="block md:col-span-2">
-              <span className="mb-2 block text-sm font-medium text-crm-ink">Assigned To</span>
-              <select
-                className="h-11 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
-                name="assigned_to"
-                onChange={(event) => updateField(event.target.name, event.target.value)}
-                value={form.assigned_to}
-              >
-                <option value="">Default to current user</option>
-                {userOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <FieldError>{errors.assigned_to}</FieldError>
-            </label>
+            {canAssignUsers ? (
+              <label className="block md:col-span-2">
+                <span className="mb-2 block text-sm font-medium text-crm-ink">Assigned To</span>
+                <select
+                  className="h-11 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
+                  name="assigned_to"
+                  onChange={(event) => updateField(event.target.name, event.target.value)}
+                  value={form.assigned_to}
+                >
+                  <option value="">Default to current user</option>
+                  {userOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <FieldError>{errors.assigned_to}</FieldError>
+              </label>
+            ) : null}
 
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-crm-ink">Priority</span>

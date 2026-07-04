@@ -1,12 +1,17 @@
 @startuml
-title Diagramme de composants - CRM
+title Diagramme de composants - CRM actuel
 
 package "Frontend React + Vite" {
   [App Router] as App
   [AuthProvider] as AuthProvider
   [ProtectedRoute] as ProtectedRoute
+  [AdminRoute] as AdminRoute
   [DashboardLayout] as Layout
-  [Pages CRUD\nSocietes, Clients, Leads,\nProduits, Commandes,\nFactures, Paiements, Taches] as PagesCrud
+  [AuthLayout] as AuthLayout
+  [Landing / Login] as PublicPages
+  [Pages CRM\nSocietes, Clients, Leads,\nProduits, Commandes, Factures,\nPaiements, Taches] as PagesCrud
+  [Users Page\nAdmin only] as UsersPage
+  [AccessDenied] as AccessDenied
   [Dashboard] as DashboardPage
   [Reports] as ReportsPage
   [Composants formulaires] as FormModals
@@ -20,18 +25,24 @@ package "Backend Node.js + Express" {
   [app.js\nmiddlewares Express] as ExpressApp
   [routes/index.js] as RoutesIndex
   [authMiddleware] as AuthMiddleware
+  [Admin authorization] as AdminAuth
   [Controllers] as Controllers
   [Validations] as Validations
-  [Services] as Services
+  [Services\nrole + scope rules] as Services
   [generateToken] as GenerateToken
-  [connection.js] as Connection
+  [connection.js\nmysql2] as Connection
 }
 
 database "MySQL" as MySQL
 
 App --> AuthProvider
 App --> ProtectedRoute
+App --> AdminRoute
+App --> AuthLayout
+AuthLayout --> PublicPages
 ProtectedRoute --> Layout
+AdminRoute --> UsersPage
+AdminRoute --> AccessDenied
 Layout --> PagesCrud
 Layout --> DashboardPage
 Layout --> ReportsPage
@@ -41,6 +52,7 @@ PagesCrud --> FormModals
 PagesCrud --> InvoiceExport : factures
 AuthProvider --> Axios
 PagesCrud --> Axios
+UsersPage --> Axios
 DashboardPage --> Axios
 ReportsPage --> Axios
 NotificationBell --> Axios
@@ -49,11 +61,12 @@ Search --> Axios
 Axios --> ExpressApp : HTTP JSON /api
 ExpressApp --> RoutesIndex
 RoutesIndex --> AuthMiddleware : routes protegees
+RoutesIndex --> AdminAuth : /api/users, writes produits
 RoutesIndex --> Controllers
 Controllers --> Validations
 Controllers --> Services
 Controllers --> GenerateToken : auth
-AuthMiddleware --> Services : findUserById
+AuthMiddleware --> Services : findUserById + status actif
 Services --> Connection
 Connection --> MySQL
 
@@ -62,5 +75,12 @@ Routes montees: auth, users, companies,
 customers, contacts, leads, categories,
 products, inventory, orders, invoices,
 payments, tasks, dashboard, notifications.
+end note
+
+note right of Services
+Les services appliquent les regles:
+Admin global, Employee scope,
+produits geres par Admin,
+utilisateurs actifs assignables.
 end note
 @enduml

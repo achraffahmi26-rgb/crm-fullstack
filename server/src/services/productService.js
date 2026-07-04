@@ -1,19 +1,24 @@
 const { getDatabase } = require('../database/connection');
 
-async function getAllProducts() {
+function isAdmin(user) {
+  return user?.role_name === 'Admin' || Number(user?.role_id) === 1;
+}
+
+async function getAllProducts(user) {
   const db = getDatabase();
-  const [rows] = await db.execute(
-    `SELECT id, category_id, name, sku, barcode, purchase_price, selling_price, description, status, created_at, updated_at FROM products`
-  );
+  const query = isAdmin(user)
+    ? `SELECT id, category_id, name, sku, barcode, purchase_price, selling_price, description, status, created_at, updated_at FROM products`
+    : `SELECT id, category_id, name, sku, barcode, purchase_price, selling_price, description, status, created_at, updated_at FROM products WHERE status = 'Active'`;
+  const [rows] = await db.execute(query);
   return rows;
 }
 
-async function getProductById(id) {
+async function getProductById(id, user = null) {
   const db = getDatabase();
-  const [rows] = await db.execute(
-    `SELECT id, category_id, name, sku, barcode, purchase_price, selling_price, description, status, created_at, updated_at FROM products WHERE id = ?`,
-    [id]
-  );
+  const query = user && !isAdmin(user)
+    ? `SELECT id, category_id, name, sku, barcode, purchase_price, selling_price, description, status, created_at, updated_at FROM products WHERE id = ? AND status = 'Active'`
+    : `SELECT id, category_id, name, sku, barcode, purchase_price, selling_price, description, status, created_at, updated_at FROM products WHERE id = ?`;
+  const [rows] = await db.execute(query, [id]);
   return rows[0] || null;
 }
 
@@ -27,12 +32,12 @@ async function getSkuByName(sku, excludeId = null) {
   const db = getDatabase();
   let query = 'SELECT id FROM products WHERE sku = ?';
   const params = [sku];
-  
+
   if (excludeId !== null) {
     query += ' AND id != ?';
     params.push(excludeId);
   }
-  
+
   const [rows] = await db.execute(query, params);
   return rows.length > 0;
 }
@@ -41,12 +46,12 @@ async function getBarcodeByValue(barcode, excludeId = null) {
   const db = getDatabase();
   let query = 'SELECT id FROM products WHERE barcode = ?';
   const params = [barcode];
-  
+
   if (excludeId !== null) {
     query += ' AND id != ?';
     params.push(excludeId);
   }
-  
+
   const [rows] = await db.execute(query, params);
   return rows.length > 0;
 }
@@ -113,10 +118,9 @@ async function updateProduct(id, data) {
   }
 
   fields.push('updated_at = CURRENT_TIMESTAMP');
-  const query = `UPDATE products SET ${fields.join(', ')} WHERE id = ?`;
   params.push(id);
 
-  await db.execute(query, params);
+  await db.execute(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`, params);
   return getProductById(id);
 }
 
@@ -135,4 +139,5 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
+  isAdmin,
 };

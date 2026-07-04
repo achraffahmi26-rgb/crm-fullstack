@@ -2,26 +2,39 @@
 title Activite - Workflow commercial implemente
 start
 
-:Utilisateur s'inscrit ou se connecte;
-if (JWT valide ?) then (oui)
+:Utilisateur interne se connecte;
+if (JWT valide et compte actif ?) then (oui)
   :Acces a l'espace CRM protege;
 else (non)
-  :Redirection vers /login ou erreur 401;
+  :Redirection vers /login ou erreur 401/403;
   stop
 endif
 
-:Creer ou mettre a jour une societe;
-:Creer client et/ou lead rattache a une societe;
+if (Role Admin ?) then (oui)
+  :Vue globale des donnees CRM;
+  :Gestion utilisateurs possible;
+  :Gestion produits possible;
+else (Employee)
+  :Vue limitee aux donnees scopees;
+  :Produits actifs en lecture/selection seulement;
+endif
+
+:Creer ou mettre a jour une societe scopee;
+:Creer client CRM et/ou lead rattache a une societe;
+:Assigner client, lead ou tache a un utilisateur actif;
 
 fork
   :Gerer le pipeline lead;
   :Statuts lead: New, Contacted,\nQualified, Proposal, Won, Lost;
 fork again
-  :Gerer les produits;
-  :Associer une categorie si fournie;
+  if (Role Admin ?) then (oui)
+    :Creer / modifier / supprimer produit;
+  else (Employee)
+    :Consulter ou selectionner produits actifs;
+  endif
 end fork
 
-:Creer une commande pour un client;
+:Creer une commande pour un client accessible;
 :Ajouter une ou plusieurs lignes produit;
 :Calculer le total depuis les lignes;
 :Enregistrer commande et lignes en transaction;
@@ -59,7 +72,11 @@ else (non)
 endif
 
 :Consulter tableau de bord et rapports;
-:Afficher statistiques, revenus mensuels,\nstatuts factures et activites recentes;
+if (Role Admin ?) then (oui)
+  :Afficher statistiques globales;
+else (Employee)
+  :Afficher statistiques My scope;
+endif
 
 stop
 @enduml

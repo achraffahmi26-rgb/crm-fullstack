@@ -23,7 +23,7 @@ export async function deleteLead(id) {
 export async function getLeadFormOptions() {
   const [companiesResponse, usersResponse] = await Promise.all([
     axiosClient.get('/companies'),
-    axiosClient.get('/users'),
+    axiosClient.get('/users/assignees'),
   ]);
 
   return {

@@ -45,17 +45,6 @@ export function AuthProvider({ children }) {
     return data.user;
   }
 
-  async function register(payload) {
-    const { data } = await axiosClient.post('/auth/register', payload);
-
-    sessionStorage.setItem(TOKEN_KEY, data.token);
-    sessionStorage.setItem(USER_KEY, JSON.stringify(data.user));
-    setToken(data.token);
-    setUser(data.user);
-
-    return data.user;
-  }
-
   function logout() {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(USER_KEY);
@@ -69,7 +58,6 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(token),
       login,
       logout,
-      register,
       token,
       user,
     }),

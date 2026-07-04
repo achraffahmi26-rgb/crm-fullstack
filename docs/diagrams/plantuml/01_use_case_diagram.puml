@@ -1,65 +1,80 @@
 @startuml
-title Diagramme de cas d'utilisation - CRM
+title Diagramme de cas d'utilisation - CRM actuel
 left to right direction
 
 actor "Visiteur" as Visiteur
-actor "Utilisateur authentifie" as Utilisateur
+actor "Employee / Utilisateur authentifie" as Employee
+actor "Administrateur" as Admin
+
+Admin --|> Employee
 
 rectangle "Application CRM" {
   usecase "Consulter la page d'accueil" as UC_Landing
-  usecase "S'inscrire" as UC_Register
   usecase "Se connecter" as UC_Login
+  usecase "Acceder a l'espace CRM protege" as UC_Protected
   usecase "Se deconnecter" as UC_Logout
 
-  usecase "Consulter le tableau de bord" as UC_Dashboard
+  usecase "Consulter le tableau de bord\n(My scope pour Employee, global pour Admin)" as UC_Dashboard
   usecase "Rechercher dans les modules CRM" as UC_Search
   usecase "Gerer les notifications" as UC_Notifications
 
-  usecase "Gerer les societes" as UC_Companies
-  usecase "Gerer les clients" as UC_Customers
-  usecase "Gerer les leads" as UC_Leads
-  usecase "Gerer les produits" as UC_Products
-  usecase "Gerer les commandes" as UC_Orders
-  usecase "Gerer les factures" as UC_Invoices
+  usecase "Gerer les societes scopees" as UC_Companies
+  usecase "Gerer les clients CRM scopees" as UC_Customers
+  usecase "Gerer les leads scopees" as UC_Leads
+  usecase "Gerer les commandes scopees" as UC_Orders
+  usecase "Gerer les factures scopees" as UC_Invoices
   usecase "Previsualiser, imprimer et telecharger une facture" as UC_InvoiceExport
-  usecase "Gerer les paiements" as UC_Payments
-  usecase "Gerer les taches" as UC_Tasks
-  usecase "Consulter les rapports" as UC_Reports
+  usecase "Gerer les paiements scopees" as UC_Payments
+  usecase "Gerer les taches scopees" as UC_Tasks
+  usecase "Consulter les rapports\n(My scope pour Employee, global pour Admin)" as UC_Reports
+  usecase "Voir / selectionner les produits actifs" as UC_ProductRead
 
-  usecase "Gerer les utilisateurs" as UC_UsersApi
+  usecase "Gerer les utilisateurs\n(lister, creer, modifier, activer/desactiver, reset password)" as UC_Users
+  usecase "Gerer les produits\n(creer, modifier, supprimer)" as UC_ProductManage
   usecase "Gerer les contacts" as UC_ContactsApi
   usecase "Gerer les categories" as UC_CategoriesApi
   usecase "Gerer l'inventaire" as UC_InventoryApi
 }
 
 Visiteur --> UC_Landing
-Visiteur --> UC_Register
 Visiteur --> UC_Login
 
-Utilisateur --> UC_Logout
-Utilisateur --> UC_Dashboard
-Utilisateur --> UC_Search
-Utilisateur --> UC_Notifications
-Utilisateur --> UC_Companies
-Utilisateur --> UC_Customers
-Utilisateur --> UC_Leads
-Utilisateur --> UC_Products
-Utilisateur --> UC_Orders
-Utilisateur --> UC_Invoices
-Utilisateur --> UC_Payments
-Utilisateur --> UC_Tasks
-Utilisateur --> UC_Reports
+Employee --> UC_Protected
+Employee --> UC_Logout
+Employee --> UC_Dashboard
+Employee --> UC_Search
+Employee --> UC_Notifications
+Employee --> UC_Companies
+Employee --> UC_Customers
+Employee --> UC_Leads
+Employee --> UC_Orders
+Employee --> UC_Invoices
+Employee --> UC_Payments
+Employee --> UC_Tasks
+Employee --> UC_Reports
+Employee --> UC_ProductRead
+
+Admin --> UC_Users
+Admin --> UC_ProductManage
 
 UC_Invoices --> UC_InvoiceExport : inclut
-UC_Products --> UC_CategoriesApi : utilise
-UC_Customers --> UC_UsersApi : options d'affectation
-UC_Leads --> UC_UsersApi : options d'affectation
-UC_Tasks --> UC_UsersApi : options d'affectation
+UC_ProductManage --> UC_CategoriesApi : utilise
 
-Utilisateur --> UC_UsersApi
-Utilisateur --> UC_ContactsApi
-Utilisateur --> UC_CategoriesApi
-Utilisateur --> UC_InventoryApi
+note right of UC_Login
+Pas d'inscription publique.
+/register redirige vers /login.
+Les comptes sont crees par l'Administrateur.
+end note
+
+note right of UC_Customers
+Client = donnee CRM uniquement.
+Aucun acteur client ne se connecte.
+end note
+
+note right of UC_Users
+/api/users est reserve a l'Administrateur.
+/api/users/assignees retourne les utilisateurs actifs assignables.
+end note
 
 note right of UC_ContactsApi
 Expose par l'API backend.

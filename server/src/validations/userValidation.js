@@ -65,7 +65,24 @@ function validateUpdateUser(data) {
   };
 }
 
+function validateResetPassword(data) {
+  const errors = {};
+
+  if (!data.password || typeof data.password !== 'string' || data.password.length < 6) {
+    errors.password = 'Password must be at least 6 characters';
+  }
+  if (data.confirmPassword !== undefined && data.password !== data.confirmPassword) {
+    errors.confirmPassword = 'Passwords do not match';
+  }
+
+  return {
+    errors,
+    isValid: Object.keys(errors).length === 0,
+  };
+}
+
 module.exports = {
   validateCreateUser,
   validateUpdateUser,
+  validateResetPassword,
 };

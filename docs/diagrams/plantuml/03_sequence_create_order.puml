@@ -1,6 +1,6 @@
 @startuml
 title Sequence - Creation d'une commande
-actor "Utilisateur authentifie" as U
+actor "Employee / Utilisateur authentifie" as U
 participant "Page Commandes\nReact" as Page
 participant "orderApi" as Api
 participant "Axios client" as Axios

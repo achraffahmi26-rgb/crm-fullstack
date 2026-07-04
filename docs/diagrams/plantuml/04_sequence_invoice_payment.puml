@@ -1,6 +1,6 @@
 @startuml
 title Sequence - Facture et paiement
-actor "Utilisateur authentifie" as U
+actor "Employee / Utilisateur authentifie" as U
 participant "Pages Factures/Paiements\nReact" as Page
 participant "invoiceApi / paymentApi" as Api
 participant "Axios client" as Axios

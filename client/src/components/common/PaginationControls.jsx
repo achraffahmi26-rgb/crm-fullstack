@@ -26,7 +26,7 @@ function PaginationControls({
   const pageNumbers = getPageNumbers(page, totalPages);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-crm-line px-4 py-3 text-sm text-crm-muted lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-1.5 border-t border-crm-line px-3 py-2 text-xs text-crm-muted lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <span>
           Showing {totalRows === 0 ? 0 : startIndex + 1}-{endIndex} of {totalRows}
@@ -34,7 +34,7 @@ function PaginationControls({
         <label className="flex items-center gap-2">
           <span>Rows</span>
           <select
-            className="h-9 rounded-md border border-crm-line bg-white px-2 text-sm font-medium text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
+            className="h-8 rounded-md border border-crm-line bg-white px-2 text-xs font-medium text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
             onChange={(event) => onPageSizeChange(Number(event.target.value))}
             value={pageSize}
           >
@@ -47,15 +47,15 @@ function PaginationControls({
         </label>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5">
         <button
           aria-label="Go to previous page"
-          className="inline-flex h-9 items-center gap-1 rounded-md border border-crm-line bg-white px-3 font-semibold hover:-translate-y-0.5 hover:bg-crm-surface hover:text-crm-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+          className="inline-flex h-8 items-center gap-1 rounded-md border border-crm-line bg-white px-2 font-semibold hover:bg-crm-surface hover:text-crm-ink disabled:cursor-not-allowed disabled:opacity-50"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
           type="button"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} />
           Previous
         </button>
 
@@ -69,10 +69,10 @@ function PaginationControls({
               <button
                 aria-current={pageNumber === page ? 'page' : undefined}
                 aria-label={`Go to page ${pageNumber}`}
-                className={`h-9 min-w-9 rounded-md border px-3 font-semibold ${
+                className={`h-8 min-w-8 rounded-md border px-2 font-semibold ${
                   pageNumber === page
                     ? 'border-crm-orange bg-crm-orange text-white'
-                    : 'border-crm-line bg-white text-crm-muted hover:-translate-y-0.5 hover:bg-crm-surface hover:text-crm-ink'
+                    : 'border-crm-line bg-white text-crm-muted hover:bg-crm-surface hover:text-crm-ink'
                 }`}
                 onClick={() => onPageChange(pageNumber)}
                 type="button"
@@ -85,13 +85,13 @@ function PaginationControls({
 
         <button
           aria-label="Go to next page"
-          className="inline-flex h-9 items-center gap-1 rounded-md border border-crm-line bg-white px-3 font-semibold hover:-translate-y-0.5 hover:bg-crm-surface hover:text-crm-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+          className="inline-flex h-8 items-center gap-1 rounded-md border border-crm-line bg-white px-2 font-semibold hover:bg-crm-surface hover:text-crm-ink disabled:cursor-not-allowed disabled:opacity-50"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
           type="button"
         >
           Next
-          <ChevronRight size={16} />
+          <ChevronRight size={14} />
         </button>
       </div>
     </div>

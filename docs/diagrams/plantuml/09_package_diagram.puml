@@ -1,14 +1,15 @@
 @startuml
-title Diagramme de packages - CRM
+title Diagramme de packages - CRM actuel
 
 package "client/src" {
   package "pages" {
     [Landing]
     [Login]
-    [Register]
     [Dashboard]
     [Reports]
-    [CRUD Pages]
+    [Users]
+    [AccessDenied]
+    [CRM CRUD Pages]
   }
 
   package "layouts" {
@@ -36,10 +37,12 @@ package "client/src" {
   package "api" {
     [axiosClient]
     [Module APIs]
+    [userApi]
   }
 
   package "routes" {
     [ProtectedRoute]
+    [AdminRoute]
   }
 
   package "utils" {
@@ -59,13 +62,17 @@ package "client/src" {
 
 package "server/src" {
   package "routes" as ServerRoutes {
-    [Route Modules]
+    [authRoutes]
+    [userRoutes]
+    [CRM Route Modules]
   }
   package "controllers" as ServerControllers {
     [Controller Modules]
   }
   package "services" as ServerServices {
     [Service Modules]
+    [userService]
+    [dashboardService]
   }
   package "validations" as ServerValidations {
     [Validation Modules]
@@ -91,9 +98,12 @@ package "server/src" {
   ServerControllers ..> ServerServices
   ServerControllers ..> ServerUtils
   ServerMiddleware ..> ServerServices
-  ServerServices ..> ServerDatabase
+  ServerServices ..> ServerDatabase : MySQL / mysql2
   ServerDatabase ..> ServerConfig
 }
 
 [Module APIs] ..> ServerRoutes : HTTP /api
+[userApi] ..> [userRoutes] : Admin users + assignees
+[AdminRoute] ..> [Users] : Admin only
+[AdminRoute] ..> [AccessDenied] : Employee direct /users
 @enduml

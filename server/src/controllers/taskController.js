@@ -3,7 +3,7 @@ const { validateCreateTask, validateUpdateTask } = require('../validations/taskV
 
 async function getTasks(req, res) {
   try {
-    const tasks = await taskService.getAllTasks();
+    const tasks = await taskService.getAllTasks(req.user);
     return res.json({ tasks });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch tasks', error: error.message });
@@ -12,7 +12,7 @@ async function getTasks(req, res) {
 
 async function getTaskById(req, res) {
   try {
-    const task = await taskService.getTaskById(req.params.id);
+    const task = await taskService.getTaskById(req.params.id, req.user);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
@@ -30,13 +30,19 @@ async function createTask(req, res) {
 
   try {
     if (req.body.assigned_to !== undefined) {
-      const userExists = await taskService.userExists(req.body.assigned_to);
-      if (!userExists) {
-        return res.status(400).json({ message: 'assigned_to does not exist' });
+      if (!taskService.isAdmin(req.user) && Number(req.body.assigned_to) !== Number(req.user.id)) {
+        return res.status(403).json({ message: 'Employees cannot assign tasks to another user' });
+      }
+
+      if (taskService.isAdmin(req.user)) {
+        const userExists = await taskService.activeUserExists(req.body.assigned_to);
+        if (!userExists) {
+          return res.status(400).json({ message: 'assigned_to active user does not exist' });
+        }
       }
     }
 
-    const task = await taskService.createTask(req.body, req.user.id);
+    const task = await taskService.createTask(req.body, req.user);
     return res.status(201).json({ task });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to create task', error: error.message });
@@ -50,19 +56,25 @@ async function updateTask(req, res) {
   }
 
   try {
-    const existingTask = await taskService.getTaskById(req.params.id);
+    const existingTask = await taskService.getTaskById(req.params.id, req.user);
     if (!existingTask) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
     if (req.body.assigned_to !== undefined) {
-      const userExists = await taskService.userExists(req.body.assigned_to);
-      if (!userExists) {
-        return res.status(400).json({ message: 'assigned_to does not exist' });
+      if (!taskService.isAdmin(req.user) && Number(req.body.assigned_to) !== Number(req.user.id)) {
+        return res.status(403).json({ message: 'Employees cannot reassign tasks to another user' });
+      }
+
+      if (taskService.isAdmin(req.user)) {
+        const userExists = await taskService.activeUserExists(req.body.assigned_to);
+        if (!userExists) {
+          return res.status(400).json({ message: 'assigned_to active user does not exist' });
+        }
       }
     }
 
-    const task = await taskService.updateTask(req.params.id, req.body);
+    const task = await taskService.updateTask(req.params.id, req.body, req.user);
     return res.json({ task });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to update task', error: error.message });
@@ -71,7 +83,7 @@ async function updateTask(req, res) {
 
 async function deleteTask(req, res) {
   try {
-    const existingTask = await taskService.getTaskById(req.params.id);
+    const existingTask = await taskService.getTaskById(req.params.id, req.user);
     if (!existingTask) {
       return res.status(404).json({ message: 'Task not found' });
     }

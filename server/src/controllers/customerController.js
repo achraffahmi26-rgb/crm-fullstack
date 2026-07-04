@@ -3,7 +3,7 @@ const { validateCreateCustomer, validateUpdateCustomer } = require('../validatio
 
 async function getCustomers(req, res) {
   try {
-    const customers = await customerService.getAllCustomers();
+    const customers = await customerService.getAllCustomers(req.user);
     return res.json({ customers });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch customers', error: error.message });
@@ -12,7 +12,7 @@ async function getCustomers(req, res) {
 
 async function getCustomerById(req, res) {
   try {
-    const customer = await customerService.getCustomerById(req.params.id);
+    const customer = await customerService.getCustomerById(req.params.id, req.user);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
@@ -34,14 +34,14 @@ async function createCustomer(req, res) {
       return res.status(400).json({ message: 'company_id does not exist' });
     }
 
-    if (req.body.assigned_to !== undefined) {
-      const assignedExists = await customerService.userExists(req.body.assigned_to);
+    if (customerService.isAdmin(req.user) && req.body.assigned_to !== undefined) {
+      const assignedExists = await customerService.activeUserExists(req.body.assigned_to);
       if (!assignedExists) {
-        return res.status(400).json({ message: 'assigned_to user does not exist' });
+        return res.status(400).json({ message: 'assigned_to active user does not exist' });
       }
     }
 
-    const customer = await customerService.createCustomer(req.body, req.user.id);
+    const customer = await customerService.createCustomer(req.body, req.user);
     return res.status(201).json({ customer });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to create customer', error: error.message });
@@ -55,7 +55,7 @@ async function updateCustomer(req, res) {
   }
 
   try {
-    const existingCustomer = await customerService.getCustomerById(req.params.id);
+    const existingCustomer = await customerService.getCustomerById(req.params.id, req.user);
     if (!existingCustomer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
@@ -68,13 +68,19 @@ async function updateCustomer(req, res) {
     }
 
     if (req.body.assigned_to !== undefined) {
-      const assignedExists = await customerService.userExists(req.body.assigned_to);
-      if (!assignedExists) {
-        return res.status(400).json({ message: 'assigned_to user does not exist' });
+      if (!customerService.isAdmin(req.user) && Number(req.body.assigned_to) !== Number(req.user.id)) {
+        return res.status(403).json({ message: 'Employees cannot reassign customers' });
+      }
+
+      if (customerService.isAdmin(req.user)) {
+        const assignedExists = await customerService.activeUserExists(req.body.assigned_to);
+        if (!assignedExists) {
+          return res.status(400).json({ message: 'assigned_to active user does not exist' });
+        }
       }
     }
 
-    const customer = await customerService.updateCustomer(req.params.id, req.body);
+    const customer = await customerService.updateCustomer(req.params.id, req.body, req.user);
     return res.json({ customer });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to update customer', error: error.message });
@@ -83,7 +89,7 @@ async function updateCustomer(req, res) {
 
 async function deleteCustomer(req, res) {
   try {
-    const existingCustomer = await customerService.getCustomerById(req.params.id);
+    const existingCustomer = await customerService.getCustomerById(req.params.id, req.user);
     if (!existingCustomer) {
       return res.status(404).json({ message: 'Customer not found' });
     }

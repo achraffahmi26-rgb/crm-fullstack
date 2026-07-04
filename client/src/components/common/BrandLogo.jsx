@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 function getLogoTarget(pathname, isAuthenticated) {
-  if (isAuthenticated && pathname !== '/' && pathname !== '/login' && pathname !== '/register') {
+  if (isAuthenticated && pathname !== '/' && pathname !== '/login') {
     return '/dashboard';
   }
 

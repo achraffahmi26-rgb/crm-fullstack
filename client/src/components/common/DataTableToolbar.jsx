@@ -12,12 +12,12 @@ function DataTableToolbar({
   const hasActiveControls = Boolean(searchTerm) || filters.some((filter) => filterValues[filter.key]);
 
   return (
-    <div className="flex w-full flex-col gap-2 lg:w-auto lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
-      <label className="flex h-10 w-full items-center gap-2 rounded-md border border-crm-line bg-crm-surface px-3 text-sm text-crm-muted focus-within:border-crm-orange focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100 lg:w-80 xl:w-96">
-        <Search size={17} />
+    <div className="flex w-full flex-col gap-1.5 lg:w-auto lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
+      <label className="flex h-9 w-full items-center gap-2 rounded-md border border-crm-line bg-crm-surface px-2.5 text-[13px] text-crm-muted focus-within:border-crm-orange focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100 lg:w-64 xl:w-72">
+        <Search size={15} />
         <input
           aria-label={searchPlaceholder || 'Search records'}
-          className="w-full border-0 bg-transparent text-crm-ink outline-none placeholder:text-slate-400"
+          className="w-full border-0 bg-transparent text-[13px] text-crm-ink outline-none placeholder:text-slate-400"
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder={searchPlaceholder}
           type="search"
@@ -28,7 +28,7 @@ function DataTableToolbar({
       {filters.map((filter) => (
         <select
           aria-label={filter.label}
-          className="h-10 rounded-md border border-crm-line bg-white px-3 text-sm font-medium text-crm-muted outline-none hover:-translate-y-0.5 hover:bg-crm-surface focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
+          className="h-9 rounded-md border border-crm-line bg-white px-2.5 text-[13px] font-medium text-crm-muted outline-none hover:bg-crm-surface focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
           key={filter.key}
           onChange={(event) => onFilterChange(filter.key, event.target.value)}
           value={filterValues[filter.key] || ''}
@@ -44,11 +44,11 @@ function DataTableToolbar({
 
       {hasActiveControls ? (
         <button
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-crm-line bg-white px-3 text-sm font-semibold text-crm-muted hover:-translate-y-0.5 hover:bg-crm-surface hover:text-crm-ink"
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-crm-line bg-white px-2.5 text-[13px] font-semibold text-crm-muted hover:bg-crm-surface hover:text-crm-ink"
           onClick={onClear}
           type="button"
         >
-          <X size={16} />
+          <X size={14} />
           Clear
         </button>
       ) : null}

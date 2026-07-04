@@ -21,6 +21,6 @@ export async function deleteTask(id) {
 }
 
 export async function getUsers() {
-  const { data } = await axiosClient.get('/users');
+  const { data } = await axiosClient.get('/users/assignees');
   return data.users || [];
 }

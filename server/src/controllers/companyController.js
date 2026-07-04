@@ -3,7 +3,7 @@ const { validateCreateCompany, validateUpdateCompany } = require('../validations
 
 async function getCompanies(req, res) {
   try {
-    const companies = await companyService.getAllCompanies();
+    const companies = await companyService.getAllCompanies(req.user);
     return res.json({ companies });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch companies', error: error.message });
@@ -12,7 +12,7 @@ async function getCompanies(req, res) {
 
 async function getCompanyById(req, res) {
   try {
-    const company = await companyService.getCompanyById(req.params.id);
+    const company = await companyService.getCompanyById(req.params.id, req.user);
     if (!company) {
       return res.status(404).json({ message: 'Company not found' });
     }
@@ -29,7 +29,7 @@ async function createCompany(req, res) {
   }
 
   try {
-    const company = await companyService.createCompany(req.body, req.user.id);
+    const company = await companyService.createCompany(req.body, req.user);
     return res.status(201).json({ company });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to create company', error: error.message });
@@ -43,12 +43,12 @@ async function updateCompany(req, res) {
   }
 
   try {
-    const existingCompany = await companyService.getCompanyById(req.params.id);
+    const existingCompany = await companyService.getCompanyById(req.params.id, req.user);
     if (!existingCompany) {
       return res.status(404).json({ message: 'Company not found' });
     }
 
-    const company = await companyService.updateCompany(req.params.id, req.body);
+    const company = await companyService.updateCompany(req.params.id, req.body, req.user);
     return res.json({ company });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to update company', error: error.message });
@@ -57,7 +57,7 @@ async function updateCompany(req, res) {
 
 async function deleteCompany(req, res) {
   try {
-    const existingCompany = await companyService.getCompanyById(req.params.id);
+    const existingCompany = await companyService.getCompanyById(req.params.id, req.user);
     if (!existingCompany) {
       return res.status(404).json({ message: 'Company not found' });
     }

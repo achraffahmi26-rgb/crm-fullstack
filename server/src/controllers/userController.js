@@ -1,5 +1,5 @@
 const userService = require('../services/userService');
-const { validateCreateUser, validateUpdateUser } = require('../validations/userValidation');
+const { validateCreateUser, validateUpdateUser, validateResetPassword } = require('../validations/userValidation');
 
 async function getUsers(req, res) {
   try {
@@ -7,6 +7,15 @@ async function getUsers(req, res) {
     return res.json({ users });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch users', error: error.message });
+  }
+}
+
+async function getAssignees(req, res) {
+  try {
+    const users = await userService.getAssignableUsers();
+    return res.json({ users });
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to fetch assignees', error: error.message });
   }
 }
 
@@ -58,10 +67,21 @@ async function updateUser(req, res) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const targetUserId = Number(req.params.id);
+    const currentUserId = Number(req.user.id);
+
+    if (targetUserId === currentUserId && req.body.status === 'Inactive') {
+      return res.status(400).json({ message: 'You cannot deactivate your own account' });
+    }
+
     if (req.body.role_id !== undefined) {
       const roleExists = await userService.roleExists(req.body.role_id);
       if (!roleExists) {
         return res.status(400).json({ message: 'role_id does not exist' });
+      }
+
+      if (targetUserId === currentUserId && Number(req.body.role_id) !== Number(existingUser.role_id)) {
+        return res.status(400).json({ message: 'You cannot change your own role' });
       }
     }
 
@@ -79,24 +99,31 @@ async function updateUser(req, res) {
   }
 }
 
-async function deleteUser(req, res) {
+async function resetUserPassword(req, res) {
+  const { errors, isValid } = validateResetPassword(req.body);
+  if (!isValid) {
+    return res.status(400).json({ errors });
+  }
+
   try {
     const existingUser = await userService.getUserById(req.params.id);
     if (!existingUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    await userService.deleteUser(req.params.id);
-    return res.json({ message: 'User deleted successfully' });
+    await userService.resetUserPassword(req.params.id, req.body.password);
+    return res.json({ message: 'Password reset successfully' });
   } catch (error) {
-    return res.status(500).json({ message: 'Unable to delete user', error: error.message });
+    return res.status(500).json({ message: 'Unable to reset password', error: error.message });
   }
 }
 
+
 module.exports = {
   getUsers,
+  getAssignees,
   getUserById,
   createUser,
   updateUser,
-  deleteUser,
+  resetUserPassword,
 };

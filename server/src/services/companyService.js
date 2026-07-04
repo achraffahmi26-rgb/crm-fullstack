@@ -1,23 +1,47 @@
 const { getDatabase } = require('../database/connection');
 
-async function getAllCompanies() {
+function isAdmin(user) {
+  return user?.role_name === 'Admin' || Number(user?.role_id) === 1;
+}
+
+const COMPANY_SELECT = `SELECT companies.id, companies.name, companies.industry, companies.email,
+        companies.phone, companies.website, companies.address, companies.city, companies.country,
+        companies.created_by, companies.created_at, companies.updated_at,
+        CONCAT(creator.first_name, ' ', creator.last_name) AS creator_user_name,
+        creator.email AS creator_user_email
+     FROM companies
+     LEFT JOIN users creator ON creator.id = companies.created_by`;
+
+function appendCompanyScope(query, params, user) {
+  if (isAdmin(user)) {
+    return { query, params };
+  }
+
+  const scopedQuery = query.includes('WHERE')
+    ? `${query} AND companies.created_by = ?`
+    : `${query} WHERE companies.created_by = ?`;
+
+  return {
+    query: scopedQuery,
+    params: [...params, user.id],
+  };
+}
+
+async function getAllCompanies(user) {
   const db = getDatabase();
-  const [rows] = await db.execute(
-    `SELECT id, name, industry, email, phone, website, address, city, country, created_by, created_at, updated_at FROM companies`
-  );
+  const scoped = appendCompanyScope(COMPANY_SELECT, [], user);
+  const [rows] = await db.execute(`${scoped.query} ORDER BY companies.created_at DESC`, scoped.params);
   return rows;
 }
 
-async function getCompanyById(id) {
+async function getCompanyById(id, user) {
   const db = getDatabase();
-  const [rows] = await db.execute(
-    `SELECT id, name, industry, email, phone, website, address, city, country, created_by, created_at, updated_at FROM companies WHERE id = ?`,
-    [id]
-  );
+  const scoped = appendCompanyScope(`${COMPANY_SELECT} WHERE companies.id = ?`, [id], user);
+  const [rows] = await db.execute(scoped.query, scoped.params);
   return rows[0] || null;
 }
 
-async function createCompany(data, userId) {
+async function createCompany(data, user) {
   const db = getDatabase();
   const [result] = await db.execute(
     `INSERT INTO companies (name, industry, email, phone, website, address, city, country, created_by, created_at, updated_at)
@@ -31,13 +55,13 @@ async function createCompany(data, userId) {
       data.address || null,
       data.city || null,
       data.country || null,
-      userId,
+      user.id,
     ]
   );
-  return getCompanyById(result.insertId);
+  return getCompanyById(result.insertId, user);
 }
 
-async function updateCompany(id, data) {
+async function updateCompany(id, data, user) {
   const db = getDatabase();
   const fields = [];
   const params = [];
@@ -76,15 +100,14 @@ async function updateCompany(id, data) {
   }
 
   if (fields.length === 0) {
-    return getCompanyById(id);
+    return getCompanyById(id, user);
   }
 
   fields.push('updated_at = CURRENT_TIMESTAMP');
-  const query = `UPDATE companies SET ${fields.join(', ')} WHERE id = ?`;
   params.push(id);
 
-  await db.execute(query, params);
-  return getCompanyById(id);
+  await db.execute(`UPDATE companies SET ${fields.join(', ')} WHERE id = ?`, params);
+  return getCompanyById(id, user);
 }
 
 async function deleteCompany(id) {
@@ -99,4 +122,5 @@ module.exports = {
   createCompany,
   updateCompany,
   deleteCompany,
+  isAdmin,
 };

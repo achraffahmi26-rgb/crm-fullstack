@@ -3,7 +3,7 @@ title Diagramme de deploiement - CRM
 
 node "Navigateur utilisateur" as Browser {
   artifact "Application React\n(Vite build)" as ReactApp
-  storage "localStorage\ncrm_token, crm_user" as LocalStorage
+  storage "sessionStorage\ncrm_token, crm_user" as LocalStorage
 }
 
 node "Serveur frontend" as FrontendServer {
@@ -21,7 +21,7 @@ database "Serveur MySQL" as MySQL {
 }
 
 ReactApp --> StaticAssets : charge
-ReactApp --> LocalStorage : lit/ecrit token et utilisateur
+ReactApp --> LocalStorage : lit/ecrit session token et utilisateur
 ReactApp --> ExpressApp : HTTP JSON\nAuthorization Bearer
 ExpressApp --> JwtAuth : verifier JWT / hasher password
 ExpressApp --> Services

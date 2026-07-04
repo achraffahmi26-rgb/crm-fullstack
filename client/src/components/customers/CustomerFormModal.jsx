@@ -42,10 +42,9 @@ function validateForm(form) {
   return errors;
 }
 
-function toPayload(form) {
-  return {
+function toPayload(form, canAssignUsers) {
+  const payload = {
     company_id: Number(form.company_id),
-    assigned_to: form.assigned_to ? Number(form.assigned_to) : undefined,
     first_name: form.first_name.trim(),
     last_name: form.last_name.trim(),
     email: form.email.trim() || null,
@@ -54,6 +53,12 @@ function toPayload(form) {
     address: form.address.trim() || null,
     notes: form.notes.trim() || null,
   };
+
+  if (canAssignUsers) {
+    payload.assigned_to = form.assigned_to ? Number(form.assigned_to) : undefined;
+  }
+
+  return payload;
 }
 
 function FieldError({ children }) {
@@ -64,7 +69,7 @@ function FieldError({ children }) {
   return <p className="mt-1 text-xs font-medium text-red-600">{children}</p>;
 }
 
-function CustomerFormModal({ companies, customer, isOpen, isSaving, onClose, onSubmit, users }) {
+function CustomerFormModal({ canAssignUsers = false, companies, customer, isOpen, isSaving, onClose, onSubmit, users }) {
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(emptyForm);
 
@@ -122,7 +127,7 @@ function CustomerFormModal({ companies, customer, isOpen, isSaving, onClose, onS
       return;
     }
 
-    await onSubmit(toPayload(form));
+    await onSubmit(toPayload(form, canAssignUsers));
   }
 
   return (
@@ -174,22 +179,24 @@ function CustomerFormModal({ companies, customer, isOpen, isSaving, onClose, onS
               <FieldError>{errors.company_id}</FieldError>
             </label>
 
-            <label className="block">
-              <span className="mb-2 block text-sm font-medium text-crm-ink">Assigned To</span>
-              <select
-                className="h-11 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
-                name="assigned_to"
-                onChange={handleChange}
-                value={form.assigned_to}
-              >
-                <option value="">Use authenticated user</option>
-                {userOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {canAssignUsers ? (
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-crm-ink">Assigned To</span>
+                <select
+                  className="h-11 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
+                  name="assigned_to"
+                  onChange={handleChange}
+                  value={form.assigned_to}
+                >
+                  <option value="">Use authenticated user</option>
+                  {userOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
 
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-crm-ink">First Name</span>

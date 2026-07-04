@@ -5,20 +5,47 @@ function getCustomerFullName(customer) {
   return `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'Unnamed customer';
 }
 
-async function getAllCustomers() {
+function isAdmin(user) {
+  return user?.role_name === 'Admin' || Number(user?.role_id) === 1;
+}
+
+const CUSTOMER_SELECT = `SELECT customers.id, customers.company_id, customers.assigned_to, customers.created_by,
+        customers.first_name, customers.last_name, customers.email, customers.phone, customers.status,
+        customers.address, customers.notes, customers.created_at, customers.updated_at,
+        CONCAT(assignee.first_name, ' ', assignee.last_name) AS assigned_user_name,
+        assignee.email AS assigned_user_email,
+        CONCAT(creator.first_name, ' ', creator.last_name) AS creator_user_name,
+        creator.email AS creator_user_email
+     FROM customers
+     LEFT JOIN users assignee ON assignee.id = customers.assigned_to
+     LEFT JOIN users creator ON creator.id = customers.created_by`;
+
+function appendCustomerScope(query, params, user) {
+  if (isAdmin(user)) {
+    return { query, params };
+  }
+
+  const scopedQuery = query.includes('WHERE')
+    ? `${query} AND (customers.created_by = ? OR customers.assigned_to = ?)`
+    : `${query} WHERE customers.created_by = ? OR customers.assigned_to = ?`;
+
+  return {
+    query: scopedQuery,
+    params: [...params, user.id, user.id],
+  };
+}
+
+async function getAllCustomers(user) {
   const db = getDatabase();
-  const [rows] = await db.execute(
-    `SELECT id, company_id, assigned_to, first_name, last_name, email, phone, status, address, notes, created_at, updated_at FROM customers`
-  );
+  const scoped = appendCustomerScope(CUSTOMER_SELECT, [], user);
+  const [rows] = await db.execute(`${scoped.query} ORDER BY customers.created_at DESC`, scoped.params);
   return rows;
 }
 
-async function getCustomerById(id) {
+async function getCustomerById(id, user) {
   const db = getDatabase();
-  const [rows] = await db.execute(
-    `SELECT id, company_id, assigned_to, first_name, last_name, email, phone, status, address, notes, created_at, updated_at FROM customers WHERE id = ?`,
-    [id]
-  );
+  const scoped = appendCustomerScope(`${CUSTOMER_SELECT} WHERE customers.id = ?`, [id], user);
+  const [rows] = await db.execute(scoped.query, scoped.params);
   return rows[0] || null;
 }
 
@@ -28,21 +55,23 @@ async function companyExists(companyId) {
   return rows.length > 0;
 }
 
-async function userExists(userId) {
+async function activeUserExists(userId) {
   const db = getDatabase();
-  const [rows] = await db.execute('SELECT id FROM users WHERE id = ?', [userId]);
+  const [rows] = await db.execute('SELECT id FROM users WHERE id = ? AND status = ?', [userId, 'Active']);
   return rows.length > 0;
 }
 
-async function createCustomer(data, authUserId) {
+async function createCustomer(data, user) {
   const db = getDatabase();
-  const assignedTo = data.assigned_to || authUserId;
+  const createdBy = user.id;
+  const assignedTo = isAdmin(user) ? (data.assigned_to || user.id) : user.id;
   const [result] = await db.execute(
-    `INSERT INTO customers (company_id, assigned_to, first_name, last_name, email, phone, status, address, notes, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    `INSERT INTO customers (company_id, assigned_to, created_by, first_name, last_name, email, phone, status, address, notes, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
     [
       data.company_id,
       assignedTo,
+      createdBy,
       data.first_name,
       data.last_name,
       data.email || null,
@@ -52,17 +81,17 @@ async function createCustomer(data, authUserId) {
       data.notes || null,
     ]
   );
-  const customer = await getCustomerById(result.insertId);
+  const customer = await getCustomerById(result.insertId, user);
   createNotificationSafely({
     title: 'New customer created',
     message: `Customer ${getCustomerFullName(customer)} was created.`,
     type: 'Success',
-  }, authUserId);
+  }, createdBy);
 
   return customer;
 }
 
-async function updateCustomer(id, data) {
+async function updateCustomer(id, data, user) {
   const db = getDatabase();
   const fields = [];
   const params = [];
@@ -105,15 +134,14 @@ async function updateCustomer(id, data) {
   }
 
   if (fields.length === 0) {
-    return getCustomerById(id);
+    return getCustomerById(id, user);
   }
 
   fields.push('updated_at = CURRENT_TIMESTAMP');
-  const query = `UPDATE customers SET ${fields.join(', ')} WHERE id = ?`;
   params.push(id);
 
-  await db.execute(query, params);
-  return getCustomerById(id);
+  await db.execute(`UPDATE customers SET ${fields.join(', ')} WHERE id = ?`, params);
+  return getCustomerById(id, user);
 }
 
 async function deleteCustomer(id) {
@@ -126,8 +154,9 @@ module.exports = {
   getAllCustomers,
   getCustomerById,
   companyExists,
-  userExists,
+  activeUserExists,
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  isAdmin,
 };

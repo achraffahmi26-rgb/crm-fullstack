@@ -129,3 +129,61 @@ td {
     transition-duration: 0.01ms !important;
   }
 }
+
+@layer components {
+  .crm-page-stack {
+    @apply space-y-3.5 xl:space-y-4;
+  }
+
+  .crm-table-shell {
+    @apply overflow-x-auto overscroll-x-contain;
+  }
+
+  .crm-table {
+    @apply w-full text-left text-[13px];
+  }
+
+  .crm-table thead {
+    @apply bg-crm-surface text-[11px] uppercase tracking-wide text-crm-muted;
+  }
+
+  .crm-table th {
+    @apply whitespace-nowrap px-2.5 py-1.5 align-middle font-semibold;
+  }
+
+  .crm-table td {
+    @apply px-2.5 py-1.5 align-middle leading-4;
+  }
+
+  .crm-table tbody {
+    @apply divide-y divide-crm-line;
+  }
+
+  .crm-table tbody tr {
+    @apply bg-white hover:bg-crm-surface/70;
+  }
+
+  .crm-table td:last-child,
+  .crm-table th:last-child {
+    @apply pr-3.5;
+  }
+
+  .crm-table td:first-child,
+  .crm-table th:first-child {
+    @apply pl-3.5;
+  }
+
+  .crm-table td button[aria-label] {
+    @apply min-h-8;
+  }
+
+  .crm-table-empty,
+  .crm-table-error,
+  .crm-table-loading {
+    @apply p-5 text-center sm:p-6;
+  }
+
+  .crm-table-loading .crm-skeleton-row {
+    @apply h-8 animate-pulse rounded-md bg-crm-surface;
+  }
+}
