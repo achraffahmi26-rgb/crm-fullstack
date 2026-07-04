@@ -19,7 +19,7 @@ ON DUPLICATE KEY UPDATE
   `description` = VALUES(`description`);
 
 INSERT INTO `roles` (`id`, `name`, `description`)
-VALUES (2, 'Employee', 'Default employee role for public registration')
+VALUES (2, 'Employee', 'Default employee role for internal CRM users')
 ON DUPLICATE KEY UPDATE
   `name` = VALUES(`name`),
   `description` = VALUES(`description`);

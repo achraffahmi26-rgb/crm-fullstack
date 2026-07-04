@@ -34,6 +34,10 @@ async function createCustomer(req, res) {
       return res.status(400).json({ message: 'company_id does not exist' });
     }
 
+    if (!(await customerService.companyOwnedByUser(req.body.company_id, req.user))) {
+      return res.status(403).json({ message: 'You cannot create a customer for this company' });
+    }
+
     if (customerService.isAdmin(req.user) && req.body.assigned_to !== undefined) {
       const assignedExists = await customerService.activeUserExists(req.body.assigned_to);
       if (!assignedExists) {
@@ -64,6 +68,10 @@ async function updateCustomer(req, res) {
       const companyExists = await customerService.companyExists(req.body.company_id);
       if (!companyExists) {
         return res.status(400).json({ message: 'company_id does not exist' });
+      }
+
+      if (!(await customerService.companyOwnedByUser(req.body.company_id, req.user))) {
+        return res.status(403).json({ message: 'You cannot assign this customer to that company' });
       }
     }
 

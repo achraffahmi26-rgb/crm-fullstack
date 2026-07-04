@@ -16,7 +16,7 @@ http://localhost:5000/api
 - `GET /api/auth/me` - return the current authenticated user.
 - `POST /api/auth/register` - disabled public registration endpoint; returns `403`.
 
-Frontend `/register` redirects to `/login`. There is no public Register/Create Account UI.
+Frontend `/register` redirects to `/login`. There is no public account creation UI.
 
 ## Users
 
@@ -55,4 +55,4 @@ User deletion is disabled. Admins activate/deactivate accounts instead. Inactive
 - `/api/users` is Admin-only.
 - Product write operations are Admin-only.
 - Customer records are CRM data only, not login users.
-- No Gmail, SMS, WhatsApp, or customer portal API exists in the current application.
+- No Gmail, SMS, WhatsApp, or customer-facing portal API exists in the current application.

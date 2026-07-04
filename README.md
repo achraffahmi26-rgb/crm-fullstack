@@ -24,32 +24,32 @@ CRM is a full-stack customer relationship management application built with Reac
 
 ## Current Access Model
 
-- Public registration is disabled. `/register` redirects to `/login`, `/api/auth/register` returns `403`, and the UI does not expose a Register/Create Account flow.
+- Public registration is disabled. `/register` redirects to `/login`, `/api/auth/register` returns `403`, and the UI does not expose public account creation.
 - User accounts are created by administrators from the Users module.
 - Admins can list, create, edit, activate/deactivate, and reset passwords for users.
 - `/api/users` is Admin-only.
 - `/api/users/assignees` returns active assignable users for authenticated users.
 - Customers are CRM records only; they are not login users.
-- No Gmail, SMS, WhatsApp, or customer portal integration exists in the current application.
+- No Gmail, SMS, WhatsApp, or customer-facing portal integration exists in the current application.
 
 ## Screenshots
 
-![Landing Page](screenshots/landing.png)
-![Login](screenshots/login.png)
-![Dashboard](screenshots/dashboard.png)
-![Companies](screenshots/companies.png)
-![Customers](screenshots/customers.png)
-![Leads](screenshots/leads.png)
-![Products](screenshots/products.png)
-![Orders](screenshots/orders.png)
-![Invoices](screenshots/invoices.png)
-![Payments](screenshots/payments.png)
-![Tasks](screenshots/tasks.png)
-![Reports](screenshots/reports.png)
-![Users](screenshots/users.png)
-![Employee Dashboard](screenshots/employee-dashboard.png)
-![Employee Products](screenshots/employee-products.png)
-![Access Denied](screenshots/access-denied.png)
+![Landing page without public signup](screenshots/landing.png)
+![Login page for internal users](screenshots/login.png)
+![Admin dashboard with global CRM stats](screenshots/dashboard.png)
+![Companies module](screenshots/companies.png)
+![Customers CRM records](screenshots/customers.png)
+![Leads module](screenshots/leads.png)
+![Admin product management](screenshots/products.png)
+![Orders module](screenshots/orders.png)
+![Invoices module](screenshots/invoices.png)
+![Payments module](screenshots/payments.png)
+![Tasks module](screenshots/tasks.png)
+![Reports with scoped analytics](screenshots/reports.png)
+![Admin Users management](screenshots/users.png)
+![Employee scoped dashboard](screenshots/employee-dashboard.png)
+![Employee read-only products](screenshots/employee-products.png)
+![Access Denied for Employee on Users](screenshots/access-denied.png)
 
 ## Tech Stack
 
@@ -82,6 +82,7 @@ Backend:
 |   |   `-- images/
 |   |-- src/
 |   |   |-- api/
+|   |   |-- assets/
 |   |   |-- components/
 |   |   |-- context/
 |   |   |-- hooks/
@@ -106,7 +107,6 @@ Backend:
 |   |   |-- database/
 |   |   |   `-- schema.sql
 |   |   |-- middleware/
-|   |   |-- models/
 |   |   |-- routes/
 |   |   |-- services/
 |   |   |-- utils/

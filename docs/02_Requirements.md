@@ -128,14 +128,14 @@ Public self-service account creation is not part of the current system. Customer
 - Database engine is MySQL.
 - Database access uses mysql2.
 - The schema source is `server/src/database/schema.sql`.
-- Prisma and PostgreSQL are not used.
+- The backend uses the MySQL/mysql2 service-layer architecture documented in this project.
 
 ## 5. Current Integration Boundaries
 
 The current implementation does not include:
 
 - Public user self-registration.
-- Customer/client portal login.
+- Customer-facing portal login.
 - Gmail integration.
 - SMS integration.
 - WhatsApp integration.

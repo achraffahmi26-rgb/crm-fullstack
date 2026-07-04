@@ -61,6 +61,19 @@ async function activeUserExists(userId) {
   return rows.length > 0;
 }
 
+async function companyOwnedByUser(companyId, user) {
+  if (isAdmin(user)) {
+    return companyExists(companyId);
+  }
+
+  const db = getDatabase();
+  const [rows] = await db.execute(
+    'SELECT id FROM companies WHERE id = ? AND created_by = ?',
+    [companyId, user.id]
+  );
+  return rows.length > 0;
+}
+
 async function createLead(data, user) {
   const db = getDatabase();
   const createdBy = user.id;
@@ -161,6 +174,7 @@ module.exports = {
   getLeadById,
   companyExists,
   activeUserExists,
+  companyOwnedByUser,
   createLead,
   updateLead,
   deleteLead,

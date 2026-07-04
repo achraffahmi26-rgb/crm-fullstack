@@ -10,7 +10,7 @@ CRM Pro is a modern web-based Customer Relationship Management (CRM) system deve
 
 The current implementation is role-based and uses two roles from the code and schema: Admin and Employee. Public registration is disabled. Administrators create and manage user accounts from the Users module, while Employees access only scoped CRM records according to ownership and assignment rules.
 
-Customers are CRM records only. They are not login users, and the current product does not include a customer portal or external messaging integrations.
+Customers are CRM records only. They are not login users, and the current product does not include a customer-facing portal or external messaging integrations.
 
 ---
 
@@ -66,7 +66,7 @@ The current system includes the following modules:
 
 - `/register` redirects to `/login`.
 - `/api/auth/register` returns `403`.
-- No Register/Create Account UI exists.
+- No public account creation UI exists.
 - `/api/users` is Admin-only.
 - `/api/users/assignees` returns active assignable users.
 - User deletion is disabled; deactivation is used instead.

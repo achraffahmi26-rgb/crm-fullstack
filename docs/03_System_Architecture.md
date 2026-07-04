@@ -103,7 +103,7 @@ Admin inherits Employee capabilities and adds administrative privileges.
 - Driver: mysql2.
 - Schema source: `server/src/database/schema.sql`.
 - Data access is implemented through services using SQL queries.
-- Prisma and PostgreSQL are not used.
+- The backend uses the MySQL/mysql2 service-layer architecture documented in this project.
 
 ## 8. Request Lifecycle
 
@@ -119,7 +119,7 @@ Admin inherits Employee capabilities and adds administrative privileges.
 
 ## 9. Current Integration Boundaries
 
-The current system does not include Gmail, SMS, WhatsApp, or customer portal integrations. Customers are CRM records only and are not login actors.
+The current system does not include Gmail, SMS, WhatsApp, or customer-facing portal integrations. Customers are CRM records only and are not login actors.
 
 ## 10. Future Scalability
 

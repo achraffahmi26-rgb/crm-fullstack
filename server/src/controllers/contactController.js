@@ -3,7 +3,7 @@ const { validateCreateContact, validateUpdateContact } = require('../validations
 
 async function getContacts(req, res) {
   try {
-    const contacts = await contactService.getAllContacts();
+    const contacts = await contactService.getAllContacts(req.user);
     return res.json({ contacts });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to fetch contacts', error: error.message });
@@ -12,7 +12,7 @@ async function getContacts(req, res) {
 
 async function getContactById(req, res) {
   try {
-    const contact = await contactService.getContactById(req.params.id);
+    const contact = await contactService.getContactById(req.params.id, req.user);
     if (!contact) {
       return res.status(404).json({ message: 'Contact not found' });
     }
@@ -29,12 +29,16 @@ async function createContact(req, res) {
   }
 
   try {
-    const companyExists = await contactService.companyExists(req.body.company_id);
-    if (!companyExists) {
-      return res.status(400).json({ message: 'company_id does not exist' });
+    const companyAllowed = await contactService.canUseCompany(req.body.company_id, req.user);
+    if (!companyAllowed) {
+      const companyExists = await contactService.companyExists(req.body.company_id);
+      if (!companyExists) {
+        return res.status(400).json({ message: 'company_id does not exist' });
+      }
+      return res.status(403).json({ message: 'You cannot create a contact for this company' });
     }
 
-    const contact = await contactService.createContact(req.body);
+    const contact = await contactService.createContact(req.body, req.user);
     return res.status(201).json({ contact });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to create contact', error: error.message });
@@ -54,13 +58,17 @@ async function updateContact(req, res) {
     }
 
     if (req.body.company_id !== undefined) {
-      const companyExists = await contactService.companyExists(req.body.company_id);
-      if (!companyExists) {
-        return res.status(400).json({ message: 'company_id does not exist' });
+      const companyAllowed = await contactService.canUseCompany(req.body.company_id, req.user);
+      if (!companyAllowed) {
+        const companyExists = await contactService.companyExists(req.body.company_id);
+        if (!companyExists) {
+          return res.status(400).json({ message: 'company_id does not exist' });
+        }
+        return res.status(403).json({ message: 'You cannot assign this contact to that company' });
       }
     }
 
-    const contact = await contactService.updateContact(req.params.id, req.body);
+    const contact = await contactService.updateContact(req.params.id, req.body, req.user);
     return res.json({ contact });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to update contact', error: error.message });
@@ -69,7 +77,7 @@ async function updateContact(req, res) {
 
 async function deleteContact(req, res) {
   try {
-    const existingContact = await contactService.getContactById(req.params.id);
+    const existingContact = await contactService.getContactById(req.params.id, req.user);
     if (!existingContact) {
       return res.status(404).json({ message: 'Contact not found' });
     }
