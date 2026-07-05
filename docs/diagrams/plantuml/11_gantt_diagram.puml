@@ -5,78 +5,81 @@ Project starts 2026-07-01
 saturday are closed
 sunday are closed
 
-printscale weekly
+printscale weekly zoom 2
 
--- Juillet 2026 : Analyse, conception et backend --
+-- Juillet 2026 : Analyse, Conception, Backend --
+
 [Analyse des besoins] starts 2026-07-01
 [Analyse des besoins] lasts 5 days
 [Analyse des besoins] is colored in LightBlue
 
-[Conception de la base de donnees] starts at [Analyse des besoins]'s end
-[Conception de la base de donnees] lasts 5 days
-[Conception de la base de donnees] is colored in LightBlue
+[Conception BDD] starts 2026-07-08
+[Conception BDD] lasts 5 days
+[Conception BDD] is colored in LightBlue
 
 [Conception UML / Merise] starts 2026-07-08
 [Conception UML / Merise] lasts 6 days
-[Conception UML / Merise] is colored in LightBlue
+[Conception UML / Merise] is colored in SkyBlue
 
-[Developpement du Backend] starts 2026-07-15
-[Developpement du Backend] lasts 8 days
-[Developpement du Backend] is colored in LightGreen
+[Developpement Backend] starts 2026-07-15
+[Developpement Backend] lasts 8 days
+[Developpement Backend] is colored in LightGreen
 
 [Authentification JWT] starts 2026-07-17
 [Authentification JWT] lasts 3 days
-[Authentification JWT] is colored in LightGreen
+[Authentification JWT] is colored in GreenYellow
 
-[Developpement des modules CRM] starts at [Developpement du Backend]'s end
-[Developpement des modules CRM] lasts 10 days
-[Developpement des modules CRM] is colored in LightGreen
+[Modules CRM Backend] starts 2026-07-25
+[Modules CRM Backend] lasts 10 days
+[Modules CRM Backend] is colored in PaleGreen
 
--- Aout 2026 : Frontend, fonctionnalites et finalisation --
-[Developpement du Frontend] starts 2026-08-03
-[Developpement du Frontend] lasts 12 days
-[Developpement du Frontend] is colored in Wheat
+-- Aout 2026 : Frontend, Tests, Finalisation --
 
-[Pagination / Tri / Filtres] starts 2026-08-10
+[Developpement Frontend] starts 2026-08-04
+[Developpement Frontend] lasts 10 days
+[Developpement Frontend] is colored in Wheat
+
+[Pagination / Tri / Filtres] starts 2026-08-11
 [Pagination / Tri / Filtres] lasts 4 days
-[Pagination / Tri / Filtres] is colored in Wheat
+[Pagination / Tri / Filtres] is colored in BurlyWood
 
-[Recherche globale] starts at [Pagination / Tri / Filtres]'s end
+[Recherche globale] starts 2026-08-15
 [Recherche globale] lasts 3 days
-[Recherche globale] is colored in Wheat
+[Recherche globale] is colored in Tan
 
-[Tableau de bord] starts 2026-08-10
-[Tableau de bord] lasts 5 days
-[Tableau de bord] is colored in LightYellow
+[Dashboard] starts 2026-08-11
+[Dashboard] lasts 5 days
+[Dashboard] is colored in LightYellow
 
-[Notifications] starts at [Tableau de bord]'s end
+[Notifications] starts 2026-08-18
 [Notifications] lasts 3 days
-[Notifications] is colored in LightYellow
+[Notifications] is colored in Khaki
 
-[Rapports] starts at [Tableau de bord]'s end
+[Rapports] starts 2026-08-18
 [Rapports] lasts 4 days
-[Rapports] is colored in LightYellow
+[Rapports] is colored in Gold
 
-[Generation PDF] starts 2026-08-17
+[Generation PDF] starts 2026-08-19
 [Generation PDF] lasts 4 days
-[Generation PDF] is colored in LightYellow
+[Generation PDF] is colored in Moccasin
 
-[Responsive Design] starts 2026-08-18
+[Responsive Design] starts 2026-08-20
 [Responsive Design] lasts 5 days
 [Responsive Design] is colored in Wheat
 
-[Tests d'integration] starts 2026-08-24
-[Tests d'integration] lasts 4 days
-[Tests d'integration] is colored in LightCoral
+[Tests integration] starts 2026-08-25
+[Tests integration] lasts 4 days
+[Tests integration] is colored in LightCoral
 
-[Optimisation UI/UX] starts 2026-08-24
+[Optimisation UI/UX] starts 2026-08-25
 [Optimisation UI/UX] lasts 5 days
-[Optimisation UI/UX] is colored in LightCoral
+[Optimisation UI/UX] is colored in Salmon
 
-[Documentation] starts 2026-08-26
-[Documentation] lasts 3 days
-[Documentation] is colored in Lavender
+[Documentation finale] starts 2026-08-27
+[Documentation finale] lasts 3 days
+[Documentation finale] is colored in Lavender
 
 [Livraison finale] happens 2026-08-31
 [Livraison finale] is colored in LightGreen
+
 @endgantt
