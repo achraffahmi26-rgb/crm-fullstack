@@ -413,7 +413,7 @@ function Invoices() {
                   <SortableHeader columnKey="due_date" onSort={table.toggleSort} sortConfig={table.sortConfig}>Due Date</SortableHeader>
                   <SortableHeader columnKey="total_amount" onSort={table.toggleSort} sortConfig={table.sortConfig}>Total Amount</SortableHeader>
                   <SortableHeader columnKey="payment_status" onSort={table.toggleSort} sortConfig={table.sortConfig}>Payment Status</SortableHeader>
-                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
+                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created at</SortableHeader>
                   <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>

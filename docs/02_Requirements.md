@@ -1,12 +1,12 @@
-# CRM Pro - Software Requirements Specification
+# CRM Full-Stack - Software Requirements Specification
 
 ## 1. Introduction
 
 ### 1.1 Purpose
-This document describes the current implemented requirements for CRM Pro, an internal Customer Relationship Management system for small and medium-sized businesses.
+This document describes the current implemented requirements for CRM Full-Stack, an internal Customer Relationship Management system for small and medium-sized businesses.
 
 ### 1.2 Scope
-CRM Pro provides authenticated internal users with tools for managing companies, customers, leads, products, orders, invoices, payments, tasks, reports, notifications, dashboard analytics, and Admin-managed user accounts.
+CRM Full-Stack provides authenticated internal users with tools for managing companies, customers, leads, products, orders, invoices, payments, tasks, reports, notifications, dashboard analytics, and Admin-managed user accounts.
 
 Public self-service account creation is not part of the current system. Customers are CRM records only and do not log in.
 
@@ -29,6 +29,7 @@ Public self-service account creation is not part of the current system. Customer
 - Inactive users cannot log in.
 - Inactive users with existing tokens cannot continue accessing protected routes.
 - JWT authentication protects CRM pages and API routes.
+- JWT_SECRET is required in the backend environment; there is no insecure fallback.
 
 ### 2.2 User Management
 - User management is available to Admin users only.
@@ -62,7 +63,8 @@ Public self-service account creation is not part of the current system. Customer
 
 ### 2.6 Customers
 - Customers are CRM records only, not login users.
-- Customers are scoped by `created_by` or `assigned_to`.
+- Customers are scoped by created_by or ssigned_to.
+- Customer company_id must reference a company available to the current user.
 - Admins can see and manage all customers.
 
 ### 2.7 Leads
@@ -79,6 +81,7 @@ Public self-service account creation is not part of the current system. Customer
 - Orders are scoped by creator or by owned/assigned customer.
 - Admins can see and manage all orders.
 - Orders can include product line items and totals.
+- The backend loads product prices from MySQL and calculates order totals server-side; client-supplied unit prices are not trusted.
 
 ### 2.10 Invoices
 - Invoices are scoped through issued orders and customers.
@@ -140,15 +143,16 @@ The current implementation does not include:
 - SMS integration.
 - WhatsApp integration.
 - Automated email delivery for invoices or password reset.
+- Automatic stock decrement on order creation or status change.
 
 ## 6. Future Enhancements
 
 Future enhancements may include:
 
-- AI-powered internal CRM assistant.
 - Native mobile applications.
 - Multi-company and multi-tenant architecture.
 - Online payment integrations.
 - Advanced forecasting and predictive analytics.
+- Defined inventory reservation/decrement workflow.
 
 These items are future perspectives only and are not implemented as current features.

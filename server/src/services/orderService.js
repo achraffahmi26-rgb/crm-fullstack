@@ -114,6 +114,22 @@ async function activeProductExists(productId) {
   return rows.length > 0;
 }
 
+async function getActiveProductsForOrder(connection, items) {
+  const productIds = [...new Set(items.map((item) => Number(item.product_id)))];
+  const placeholders = productIds.map(() => '?').join(', ');
+  const [products] = await connection.execute(
+    `SELECT id, selling_price FROM products WHERE id IN (${placeholders}) AND status = ?`,
+    [...productIds, 'Active']
+  );
+  const productsById = new Map(products.map((product) => [Number(product.id), product]));
+
+  if (productsById.size !== productIds.length) {
+    throw new Error('All order items must reference active products');
+  }
+
+  return productsById;
+}
+
 async function createOrder(data, user) {
   const db = getDatabase();
   const connection = await db.getConnection();
@@ -123,10 +139,22 @@ async function createOrder(data, user) {
 
     const orderNumber = generateOrderNumber();
     let totalAmount = 0;
+    const productsById = await getActiveProductsForOrder(connection, data.items);
+    const orderItems = data.items.map((item) => {
+      const product = productsById.get(Number(item.product_id));
+      const unitPrice = Number(product.selling_price);
+      const subtotal = Number(item.quantity) * unitPrice;
 
-    for (const item of data.items) {
-      const subtotal = item.quantity * item.unit_price;
-      totalAmount += subtotal;
+      return {
+        product_id: Number(item.product_id),
+        quantity: Number(item.quantity),
+        unit_price: unitPrice,
+        subtotal,
+      };
+    });
+
+    for (const item of orderItems) {
+      totalAmount += item.subtotal;
     }
 
     const [orderResult] = await connection.execute(
@@ -145,12 +173,11 @@ async function createOrder(data, user) {
 
     const orderId = orderResult.insertId;
 
-    for (const item of data.items) {
-      const subtotal = item.quantity * item.unit_price;
+    for (const item of orderItems) {
       await connection.execute(
         `INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal)
          VALUES (?, ?, ?, ?, ?)`,
-        [orderId, item.product_id, item.quantity, item.unit_price, subtotal]
+        [orderId, item.product_id, item.quantity, item.unit_price, item.subtotal]
       );
     }
 

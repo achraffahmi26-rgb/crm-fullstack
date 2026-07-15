@@ -297,10 +297,10 @@ function Orders() {
                 <tr>
                   <SortableHeader columnKey="order_number" onSort={table.toggleSort} sortConfig={table.sortConfig}>Order Number</SortableHeader>
                   <SortableHeader columnKey="customer" onSort={table.toggleSort} sortConfig={table.sortConfig}>Customer</SortableHeader>
-                  <SortableHeader columnKey="order_date" onSort={table.toggleSort} sortConfig={table.sortConfig}>Order Date</SortableHeader>
+                  <SortableHeader columnKey="order_date" onSort={table.toggleSort} sortConfig={table.sortConfig}>Order date</SortableHeader>
                   <SortableHeader columnKey="total_amount" onSort={table.toggleSort} sortConfig={table.sortConfig}>Total Amount</SortableHeader>
                   <SortableHeader columnKey="status" onSort={table.toggleSort} sortConfig={table.sortConfig}>Status</SortableHeader>
-                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
+                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created at</SortableHeader>
                   <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>

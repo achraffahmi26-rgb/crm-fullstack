@@ -263,7 +263,7 @@ function Companies() {
                   <SortableHeader columnKey="website" onSort={table.toggleSort} sortConfig={table.sortConfig}>Website</SortableHeader>
                   <SortableHeader columnKey="city" onSort={table.toggleSort} sortConfig={table.sortConfig}>City</SortableHeader>
                   <SortableHeader columnKey="country" onSort={table.toggleSort} sortConfig={table.sortConfig}>Country</SortableHeader>
-                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
+                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created at</SortableHeader>
                   <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>

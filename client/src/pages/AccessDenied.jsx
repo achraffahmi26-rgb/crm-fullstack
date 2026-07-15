@@ -17,7 +17,7 @@ function AccessDenied() {
           className="mt-6 inline-flex h-10 items-center justify-center rounded-md bg-crm-orange px-4 text-sm font-semibold text-white hover:bg-crm-orangeDark"
           to="/dashboard"
         >
-          Back to Dashboard
+          Back to dashboard
         </Link>
       </section>
     </div>

@@ -257,7 +257,7 @@ function Products() {
               type="button"
             >
               <Plus size={15} />
-              Add Product
+              Add product
             </button>
           ) : null}
         </div>
@@ -330,10 +330,10 @@ function Products() {
                   <SortableHeader columnKey="sku" onSort={table.toggleSort} sortConfig={table.sortConfig}>SKU</SortableHeader>
                   <SortableHeader columnKey="barcode" onSort={table.toggleSort} sortConfig={table.sortConfig}>Barcode</SortableHeader>
                   <SortableHeader columnKey="category" onSort={table.toggleSort} sortConfig={table.sortConfig}>Category</SortableHeader>
-                  <SortableHeader columnKey="purchase_price" onSort={table.toggleSort} sortConfig={table.sortConfig}>Purchase Price</SortableHeader>
-                  <SortableHeader columnKey="selling_price" onSort={table.toggleSort} sortConfig={table.sortConfig}>Selling Price</SortableHeader>
+                  <SortableHeader columnKey="purchase_price" onSort={table.toggleSort} sortConfig={table.sortConfig}>Purchase price</SortableHeader>
+                  <SortableHeader columnKey="selling_price" onSort={table.toggleSort} sortConfig={table.sortConfig}>Selling price</SortableHeader>
                   <SortableHeader columnKey="status" onSort={table.toggleSort} sortConfig={table.sortConfig}>Status</SortableHeader>
-                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
+                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created at</SortableHeader>
                   {canManageProducts ? <th className="text-right font-semibold">Actions</th> : null}
                 </tr>
               </thead>

@@ -36,7 +36,8 @@ end fork
 
 :Creer une commande pour un client accessible;
 :Ajouter une ou plusieurs lignes produit;
-:Calculer le total depuis les lignes;
+:Charger les prix produits depuis MySQL;
+:Calculer le total cote backend;
 :Enregistrer commande et lignes en transaction;
 :Creer notification "Nouvelle commande";
 

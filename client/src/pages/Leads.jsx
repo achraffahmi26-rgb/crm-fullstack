@@ -346,7 +346,7 @@ function Leads() {
                   <SortableHeader columnKey="source" onSort={table.toggleSort} sortConfig={table.sortConfig}>Source</SortableHeader>
                   <SortableHeader columnKey="status" onSort={table.toggleSort} sortConfig={table.sortConfig}>Status</SortableHeader>
                   <SortableHeader columnKey="estimated_value" onSort={table.toggleSort} sortConfig={table.sortConfig}>Estimated Value</SortableHeader>
-                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
+                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created at</SortableHeader>
                   <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>

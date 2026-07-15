@@ -8,7 +8,7 @@ const emptyCreateForm = {
   order_date: '',
   status: 'Pending',
   notes: '',
-  items: [{ product_id: '', quantity: '1', unit_price: '0' }],
+  items: [{ product_id: '', quantity: '1' }],
 };
 
 const emptyEditForm = {
@@ -69,9 +69,6 @@ function validateCreateForm(form, products) {
       errors[`item_${index}_quantity`] = 'Quantity must be a positive integer';
     }
 
-    if (item.unit_price === '' || Number(item.unit_price) < 0) {
-      errors[`item_${index}_unit_price`] = 'Unit price must be non-negative';
-    }
   });
 
   return errors;
@@ -96,7 +93,6 @@ function toCreatePayload(form) {
     items: form.items.map((item) => ({
       product_id: Number(item.product_id),
       quantity: Number(item.quantity),
-      unit_price: item.unit_price === '' ? 0 : Number(item.unit_price),
     })),
   };
 }
@@ -134,14 +130,20 @@ function OrderFormModal({ customers, isOpen, isSaving, onClose, onSubmit, order,
     [products],
   );
 
+  const productById = useMemo(
+    () => new Map(products.map((product) => [String(product.id), product])),
+    [products],
+  );
+
   const previewTotal = useMemo(
     () =>
       createForm.items.reduce((sum, item) => {
         const quantity = Number(item.quantity) || 0;
-        const unitPrice = Number(item.unit_price) || 0;
+        const product = productById.get(String(item.product_id));
+        const unitPrice = Number(product?.selling_price) || 0;
         return sum + quantity * unitPrice;
       }, 0),
-    [createForm.items],
+    [createForm.items, productById],
   );
 
   useEffect(() => {
@@ -188,18 +190,13 @@ function OrderFormModal({ customers, isOpen, isSaving, onClose, onSubmit, order,
   }
 
   function handleProductChange(index, productId) {
-    const product = products.find((item) => String(item.id) === productId);
     updateItem(index, 'product_id', productId);
-
-    if (product && createForm.items[index]?.unit_price === '0') {
-      updateItem(index, 'unit_price', String(product.selling_price ?? 0));
-    }
   }
 
   function addItem() {
     setCreateForm((current) => ({
       ...current,
-      items: [...current.items, { product_id: '', quantity: '1', unit_price: '0' }],
+      items: [...current.items, { product_id: '', quantity: '1' }],
     }));
   }
 
@@ -314,7 +311,7 @@ function OrderFormModal({ customers, isOpen, isSaving, onClose, onSubmit, order,
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-crm-ink">Order Date</span>
+                  <span className="mb-2 block text-sm font-medium text-crm-ink">Order date</span>
                   <input
                     className="h-11 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
                     name="order_date"
@@ -392,22 +389,16 @@ function OrderFormModal({ customers, isOpen, isSaving, onClose, onSubmit, order,
                         <FieldError>{errors[`item_${index}_quantity`]}</FieldError>
                       </label>
 
-                      <label className="block">
-                        <span className="mb-2 block text-xs font-medium text-crm-muted">Unit Price</span>
-                        <input
-                          className="h-10 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
-                          min="0"
-                          onChange={(event) => updateItem(index, 'unit_price', event.target.value)}
-                          step="0.01"
-                          type="number"
-                          value={item.unit_price}
-                        />
-                        <FieldError>{errors[`item_${index}_unit_price`]}</FieldError>
-                      </label>
+                      <div>
+                        <span className="mb-2 block text-xs font-medium text-crm-muted">Unit price</span>
+                        <p className="flex h-10 items-center rounded-md border border-crm-line bg-crm-surface px-3 text-sm font-medium text-crm-ink">
+                          {new Intl.NumberFormat('en-US').format(Number(productById.get(String(item.product_id))?.selling_price) || 0)} MAD
+                        </p>
+                      </div>
 
                       <div className="flex items-end justify-between gap-3 md:justify-end">
                         <p className="pb-2 text-sm font-semibold text-crm-ink">
-                          {new Intl.NumberFormat('en-US').format((Number(item.quantity) || 0) * (Number(item.unit_price) || 0))} MAD
+                          {new Intl.NumberFormat('en-US').format((Number(item.quantity) || 0) * (Number(productById.get(String(item.product_id))?.selling_price) || 0))} MAD
                         </p>
                         <button
                           className="mb-0.5 rounded-md border border-red-100 p-2 text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"

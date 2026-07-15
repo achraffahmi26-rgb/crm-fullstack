@@ -13,7 +13,7 @@ database "MySQL" as DB
 participant "notificationService" as Notif
 
 U -> Page : Remplit le formulaire commande
-Page -> Page : Valide client, date, statut, lignes
+Page -> Page : Valide client, date, statut, lignes\n(sans prix editable fiable)
 Page -> Api : createOrder(payload)
 Api -> Axios : POST /orders + Bearer JWT
 Axios -> Routes : Requete /api/orders
@@ -33,17 +33,19 @@ else donnees valides
   Service -> DB : SELECT id FROM customers
   DB --> Service : resultat
   loop pour chaque ligne
-    Controller -> Service : productExists(product_id)
-    Service -> DB : SELECT id FROM products
+    Controller -> Service : activeProductExists(product_id)
+    Service -> DB : SELECT id FROM products WHERE status = Active
     DB --> Service : resultat
   end
   Controller -> Service : createOrder(body, req.user.id)
   Service -> DB : BEGIN TRANSACTION
   Service -> Service : Generer ORD-YYYYMMDD-####
-  Service -> Service : Calculer total = somme(qte * prix)
+  Service -> DB : SELECT id, selling_price FROM products actifs
+  DB --> Service : prix produits
+  Service -> Service : Calculer total = somme(qte * selling_price DB)
   Service -> DB : INSERT orders
   loop pour chaque ligne
-    Service -> DB : INSERT order_items
+    Service -> DB : INSERT order_items avec unit_price snapshot DB
   end
   Service -> DB : COMMIT
   Service -> DB : SELECT commande + lignes

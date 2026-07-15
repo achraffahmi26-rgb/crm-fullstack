@@ -31,7 +31,7 @@ rectangle "Application CRM" {
 
   usecase "Gerer les utilisateurs\n(lister, creer, modifier, activer/desactiver, reset password)" as UC_Users
   usecase "Gerer les produits\n(creer, modifier, supprimer)" as UC_ProductManage
-  usecase "Gerer les contacts" as UC_ContactsApi
+  usecase "Gerer les contacts\n(scope via societes possedees)" as UC_ContactsApi
   usecase "Gerer les categories" as UC_CategoriesApi
   usecase "Gerer l'inventaire" as UC_InventoryApi
 }
@@ -78,11 +78,13 @@ end note
 
 note right of UC_ContactsApi
 Expose par l'API backend.
+Acces limite via ownership des societes.
 Pas de page frontend dediee trouvee.
 end note
 
 note right of UC_InventoryApi
 Expose par l'API backend.
+Acces limite via ownership des societes.
 Pas de page frontend dediee trouvee.
 end note
 @enduml

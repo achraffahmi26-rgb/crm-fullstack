@@ -304,7 +304,7 @@ function Payments() {
                   <SortableHeader columnKey="payment_date" onSort={table.toggleSort} sortConfig={table.sortConfig}>Payment Date</SortableHeader>
                   <SortableHeader columnKey="reference" onSort={table.toggleSort} sortConfig={table.sortConfig}>Reference</SortableHeader>
                   <SortableHeader columnKey="transaction_id" onSort={table.toggleSort} sortConfig={table.sortConfig}>Transaction ID</SortableHeader>
-                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
+                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created at</SortableHeader>
                   <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>

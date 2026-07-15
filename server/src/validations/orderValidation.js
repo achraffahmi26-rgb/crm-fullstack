@@ -23,9 +23,6 @@ function validateCreateOrder(data) {
       if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
         itemErrors.push(`Item ${index + 1}: quantity must be a positive integer`);
       }
-      if (typeof item.unit_price !== 'number' || item.unit_price < 0) {
-        itemErrors.push(`Item ${index + 1}: unit_price must be a non-negative number`);
-      }
     });
     if (itemErrors.length > 0) {
       errors.items = itemErrors;

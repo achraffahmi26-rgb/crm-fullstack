@@ -1,12 +1,12 @@
-# CRM Pro - Project Overview
+# CRM Full-Stack - Project Overview
 
 ## Project Title
-**CRM Pro - Customer Relationship Management System**
+**CRM Full-Stack - Customer Relationship Management System**
 
 ---
 
 ## Introduction
-CRM Pro is a modern web-based Customer Relationship Management (CRM) system developed to help businesses manage companies, customers, products, sales, invoices, payments, tasks, reports, notifications, and internal user access from a centralized platform.
+CRM Full-Stack is a modern web-based Customer Relationship Management (CRM) system developed to help businesses manage companies, customers, products, sales, invoices, payments, tasks, reports, notifications, and internal user access from a centralized platform.
 
 The current implementation is role-based and uses two roles from the code and schema: Admin and Employee. Public registration is disabled. Administrators create and manage user accounts from the Users module, while Employees access only scoped CRM records according to ownership and assignment rules.
 
@@ -17,12 +17,12 @@ Customers are CRM records only. They are not login users, and the current produc
 ## Problem Statement
 Many small and medium-sized businesses still rely on spreadsheets or manual processes to manage customer information, sales, billing, and daily operations. These methods are inefficient, error-prone, and make it difficult to monitor performance or enforce access control.
 
-CRM Pro addresses these challenges by providing a centralized, secure, and scalable internal platform with clear Admin and Employee responsibilities.
+CRM Full-Stack addresses these challenges by providing a centralized, secure, and scalable internal platform with clear Admin and Employee responsibilities.
 
 ---
 
 ## Project Objectives
-The main objectives of CRM Pro are:
+The main objectives of CRM Full-Stack are:
 
 - Develop a modern and scalable internal CRM platform.
 - Centralize business data in a single MySQL-backed system.
@@ -52,9 +52,12 @@ The current system includes the following modules:
 - Admin-only user management: list, create, edit, activate/deactivate, and reset passwords.
 - Dashboard and reports with global Admin views or Employee "My" scoped views.
 - Company, customer, and lead management with ownership and assignment scope.
+- Contact access scoped through owned companies.
+- Customer and lead company selection validated against Employee company ownership.
 - Product management with Admin-only create/edit/delete actions.
 - Active product selection for Employees.
 - Sales management with orders and invoices.
+- Order totals calculated by the backend from database product prices.
 - Payment and task management.
 - Reports and notifications.
 - Invoice preview, printing, and PDF export.
@@ -82,7 +85,7 @@ The current system includes the following modules:
 ---
 
 ## Expected Benefits
-CRM Pro helps organizations:
+CRM Full-Stack helps organizations:
 
 - Improve productivity.
 - Reduce manual work.
@@ -101,10 +104,10 @@ The project follows modern software engineering practices including modular Reac
 ## Future Improvements
 Future enhancements may include:
 
-- AI assistant for internal CRM analysis.
 - Native mobile application.
 - Multi-company support.
 - Multi-tenant architecture.
 - Online payment integrations.
+- Clear stock reservation/decrement workflow for confirmed or completed orders.
 
 These items are not part of the current implementation.

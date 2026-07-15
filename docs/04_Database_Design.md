@@ -1,12 +1,12 @@
-# CRM Pro – Database Design
+# CRM Full-Stack – Database Design
 
 ## 1. Database Overview
 
-This document defines the database design principles for CRM Pro, aligning the data architecture with the project’s technology stack. The database layer will support the CRM application’s core modules while enabling maintainability, performance, and consistency.
+This document defines the database design principles for CRM Full-Stack, aligning the data architecture with the project’s technology stack. The database layer will support the CRM application’s core modules while enabling maintainability, performance, and consistency.
 
 ## 2. Why MySQL was selected
 
-MySQL is selected as the relational database for CRM Pro due to its broad adoption, strong community support, and proven reliability in enterprise web applications. MySQL provides mature transactional support, flexible indexing, and compatibility with common hosting environments, which makes it a suitable choice for a scalable CRM platform.
+MySQL is selected as the relational database for CRM Full-Stack due to its broad adoption, strong community support, and proven reliability in enterprise web applications. MySQL provides mature transactional support, flexible indexing, and compatibility with common hosting environments, which makes it a suitable choice for a scalable CRM platform.
 
 ## 3. Why phpMyAdmin is used
 
@@ -59,7 +59,7 @@ A robust backup strategy protects the data and supports recovery.
 
 ## 10. Security Considerations
 
-Database security is a foundational requirement for CRM Pro.
+Database security is a foundational requirement for CRM Full-Stack.
 
 - Use strong credentials and role-based access for database users.
 - Limit database access to authorized application servers.
@@ -67,25 +67,25 @@ Database security is a foundational requirement for CRM Pro.
 - Ensure backups are stored securely and access is restricted.
 - Monitor database access and audit user activity.
 
-## Planned Database Entities
+## Current Database Entities
 
 ### Security
 
 - **Roles**: Defines named access levels and permission sets used by the authorization layer.
-- **Users**: Represents authenticated individuals who access CRM Pro and associates them with roles.
+- **Users**: Represents authenticated individuals who access CRM Full-Stack and associates them with roles.
 
 ### CRM
 
 - **Companies**: Captures organization-level customer data and business profile details.
 - **Customers**: Represents individual or corporate customers managed within the CRM.
-- **Contacts**: Stores contact persons linked to companies or customers.
+- **Contacts**: Stores contact persons linked to companies.
 - **Leads**: Tracks prospective customer opportunities and qualification status.
 
 ### Inventory
 
 - **Categories**: Organizes products into logical groups for catalog management.
 - **Products**: Represents goods or services offered through the sales process.
-- **Inventory**: Tracks stock levels, availability, and inventory movement.
+- **Inventory**: Tracks stock levels and warehouse location. Automatic stock decrement is not implemented yet.
 
 ### Sales
 
@@ -108,7 +108,7 @@ Database security is a foundational requirement for CRM Pro.
 
 ## Conceptual Entity Relationships
 
-The following conceptual relationships define how the main entities interact within CRM Pro. These relationships are described at a high level and will guide the later ERD and physical schema design.
+The following conceptual relationships define how the main entities interact within CRM Full-Stack. These relationships are described at a high level and will guide the later ERD and physical schema design.
 
 - One **Role** can have many **Users**.
 - One **Company** can have many **Customers**.
@@ -124,7 +124,7 @@ The following conceptual relationships define how the main entities interact wit
 - One **User** can receive many **Notifications**.
 - One **User** can generate many **Activities**.
 
-The physical ERD and MySQL schema will be created during the next database design phase.
+The physical ERD and MySQL schema are implemented in `server/src/database/schema.sql`.
 
 ## Detailed Entity Design - CRM Module
 
@@ -183,7 +183,7 @@ The `companies` entity captures organization-level customer data and business pr
 
 ### Customers
 
-The `customers` entity represents individuals or organizations managed within CRM Pro.
+The `customers` entity represents individuals or organizations managed within CRM Full-Stack.
 
 - `id`
   - Data Type: INT
@@ -425,7 +425,7 @@ The `products` entity represents goods and services that can be sold or stocked.
 
 ### Inventory
 
-The `inventory` entity tracks stock levels and warehouse location for a product.
+The `inventory` entity tracks stock levels and warehouse location for a product. Automatic stock decrement on order creation or status change is not implemented yet.
 
 - `id`
   - Data Type: INT
@@ -523,7 +523,7 @@ The `order_items` entity captures product line items for each order.
 - `unit_price`
   - Data Type: DECIMAL(10, 2)
   - Constraints: NOT NULL
-  - Description: Unit price charged for the product at the time of the order.
+  - Description: Unit price snapshot charged for the product at the time of the order. It is calculated by the backend from the product `selling_price`, not trusted from the frontend payload.
 - `subtotal`
   - Data Type: DECIMAL(12, 2)
   - Constraints: NOT NULL
@@ -720,47 +720,6 @@ The `activities` entity records user actions and important system events for aud
   - Constraints: DEFAULT CURRENT_TIMESTAMP
   - Description: Timestamp when the activity record was created.
 
-### Settings
-
-The `settings` entity captures system-wide configuration values for the CRM instance.
-
-- `id`
-  - Data Type: INT
-  - Constraints: Primary Key, AUTO_INCREMENT
-  - Description: Unique identifier for the settings record.
-- `company_name`
-  - Data Type: VARCHAR(255)
-  - Constraints: NULL
-  - Description: Official company name used in branding and communications.
-- `company_email`
-  - Data Type: VARCHAR(150)
-  - Constraints: NULL
-  - Description: Primary company email address.
-- `company_phone`
-  - Data Type: VARCHAR(50)
-  - Constraints: NULL
-  - Description: Primary company phone number.
-- `company_address`
-  - Data Type: VARCHAR(255)
-  - Constraints: NULL
-  - Description: Primary company address.
-- `currency`
-  - Data Type: VARCHAR(10)
-  - Constraints: NULL
-  - Description: Default currency code used for monetary values.
-- `timezone`
-  - Data Type: VARCHAR(100)
-  - Constraints: NULL
-  - Description: Default timezone setting for the application.
-- `created_at`
-  - Data Type: TIMESTAMP
-  - Constraints: DEFAULT CURRENT_TIMESTAMP
-  - Description: Timestamp when the settings record was created.
-- `updated_at`
-  - Data Type: TIMESTAMP
-  - Constraints: DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  - Description: Timestamp when the settings record was last updated.
-
 ### Productivity & System Relationships
 
 - One **User** can have many **Tasks**.
@@ -770,4 +729,4 @@ The `settings` entity captures system-wide configuration values for the CRM inst
 
 ## Entity Relationship Model (ERD)
 
-The Entity Relationship Model will be designed later during the database modeling phase. A dedicated ERD section will define entities, relationships, and cardinality once the schema planning is finalized.
+The entity relationship model is reflected by the MySQL schema, DBML model, and PlantUML physical data model included in this project.

@@ -1,8 +1,8 @@
-# CRM Pro - API Design
+# CRM Full-Stack - API Design
 
 ## Overview
 
-CRM Pro exposes a REST JSON API from the Node.js + Express backend. Most routes are protected by JWT authentication middleware. Controllers delegate business behavior to service modules, and services apply role-based and ownership-based scope rules before querying MySQL through mysql2.
+CRM Full-Stack exposes a REST JSON API from the Node.js + Express backend. Most routes are protected by JWT authentication middleware. Controllers delegate business behavior to service modules, and services apply role-based and ownership-based scope rules before querying MySQL through mysql2.
 
 Base URL in local development:
 
@@ -31,10 +31,10 @@ User deletion is disabled. Admins activate/deactivate accounts instead. Inactive
 ## CRM Modules
 
 - `/api/companies` - scoped company CRUD. Companies are scoped by `created_by` for Employees.
-- `/api/customers` - scoped customer CRUD. Customers are scoped by `created_by` or `assigned_to`.
-- `/api/leads` - scoped lead CRUD. Leads are scoped by `created_by` or `assigned_to`.
+- `/api/customers` - scoped customer CRUD. Customers are scoped by `created_by` or `assigned_to`; `company_id` must be available to the current user.
+- `/api/leads` - scoped lead CRUD. Leads are scoped by `created_by` or `assigned_to`; `company_id` must be available to the current user.
 - `/api/products` - product catalog. Admins can create/edit/delete products; Employees can view/select active products.
-- `/api/orders` - scoped order CRUD. Orders are scoped by creator or owned/assigned customer.
+- `/api/orders` - scoped order CRUD. Orders are scoped by creator or owned/assigned customer. Product prices are loaded from MySQL and totals are calculated backend-side.
 - `/api/invoices` - scoped invoice CRUD. Invoices are scoped through issued orders and customers.
 - `/api/payments` - scoped payment CRUD. Payments are scoped through invoices, orders, and customers.
 - `/api/tasks` - scoped task CRUD. Tasks are scoped by `created_by` or `assigned_to`.
@@ -43,7 +43,7 @@ User deletion is disabled. Admins activate/deactivate accounts instead. Inactive
 
 ## Additional Backend Modules
 
-- `/api/contacts` - contact CRUD exposed by the backend.
+- `/api/contacts` - contact CRUD exposed by the backend and scoped through owned companies.
 - `/api/categories` - category CRUD exposed by the backend.
 - `/api/inventory` - inventory CRUD exposed by the backend.
 - `GET /api/health` - health check.
@@ -56,3 +56,11 @@ User deletion is disabled. Admins activate/deactivate accounts instead. Inactive
 - Product write operations are Admin-only.
 - Customer records are CRM data only, not login users.
 - No Gmail, SMS, WhatsApp, or customer-facing portal API exists in the current application.
+
+
+## Security and Environment Notes
+
+- `JWT_SECRET` is required; the backend fails clearly if it is missing.
+- Browser origins can be restricted with `CLIENT_URL` or `CORS_ORIGIN`.
+- The optional demo seed is `server/src/database/seeds/demo_data.sql`; it is never imported automatically.
+- Inventory stock decrement is not automatic and remains a documented limitation/future improvement.

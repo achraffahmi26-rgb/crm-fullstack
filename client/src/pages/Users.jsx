@@ -669,7 +669,7 @@ function UsersPage() {
                   <th className="font-semibold">Email</th>
                   <th className="font-semibold">Role</th>
                   <th className="font-semibold">Status</th>
-                  <th className="font-semibold">Created At</th>
+                  <th className="font-semibold">Created at</th>
                   <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>

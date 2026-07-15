@@ -12,7 +12,7 @@ node "Serveur frontend" as FrontendServer {
 
 node "Serveur API Node.js" as ApiServer {
   artifact "Express app\n/api" as ExpressApp
-  artifact "JWT auth\nbcrypt, jsonwebtoken" as JwtAuth
+  artifact "JWT auth\nbcrypt, jsonwebtoken\nJWT_SECRET requis" as JwtAuth
   artifact "Services CRM" as Services
 }
 
@@ -29,7 +29,9 @@ Services --> MySQL : mysql2/promise
 
 note bottom of ApiServer
 Port backend configure par PORT.
-Le client actuel utilise http://localhost:5000/api.
+JWT_SECRET est obligatoire.
+CLIENT_URL ou CORS_ORIGIN limite l'origine navigateur.
+Le client local utilise http://localhost:5000/api.
 end note
 
 note bottom of MySQL

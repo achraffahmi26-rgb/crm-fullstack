@@ -228,7 +228,7 @@ function ProductFormModal({ categories, isOpen, isSaving, onClose, onSubmit, pro
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-crm-ink">Purchase Price</span>
+              <span className="mb-2 block text-sm font-medium text-crm-ink">Purchase price</span>
               <input
                 className="h-11 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
                 min="0"
@@ -242,7 +242,7 @@ function ProductFormModal({ categories, isOpen, isSaving, onClose, onSubmit, pro
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-crm-ink">Selling Price</span>
+              <span className="mb-2 block text-sm font-medium text-crm-ink">Selling price</span>
               <input
                 className="h-11 w-full rounded-md border border-crm-line bg-white px-3 text-sm text-crm-ink outline-none focus:border-crm-orange focus:ring-2 focus:ring-orange-100"
                 min="0"

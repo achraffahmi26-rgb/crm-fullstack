@@ -1,6 +1,6 @@
-# CRM
+# CRM Full-Stack
 
-CRM is a full-stack customer relationship management application built with React + Vite on the frontend, Node.js + Express on the backend, and MySQL + mysql2 in the database. It provides an internal workspace for managing companies, customers, leads, products, orders, invoices, payments, tasks, reports, notifications, users, and dashboard analytics.
+CRM Full-Stack is a customer relationship management application built with React + Vite on the frontend, Node.js + Express on the backend, and MySQL + mysql2 in the database. It provides an internal workspace for managing companies, customers, leads, products, orders, invoices, payments, tasks, reports, notifications, users, and dashboard analytics.
 
 ## Features
 
@@ -14,6 +14,7 @@ CRM is a full-stack customer relationship management application built with Reac
 - Employees see only their scoped records.
 - Companies are scoped by `created_by`.
 - Customers and leads are scoped by `created_by` or `assigned_to`.
+- Contacts are scoped through owned companies.
 - Orders are scoped by creator or owned/assigned customer.
 - Invoices and payments are scoped through issued orders and customers.
 - Tasks are scoped by `created_by` or `assigned_to`.
@@ -30,11 +31,12 @@ CRM is a full-stack customer relationship management application built with Reac
 - `/api/users` is Admin-only.
 - `/api/users/assignees` returns active assignable users for authenticated users.
 - Customers are CRM records only; they are not login users.
+- Contacts are company-linked CRM records and follow company ownership scope.
 - No Gmail, SMS, WhatsApp, or customer-facing portal integration exists in the current application.
 
 ## Screenshots
 
-![Landing page without public signup](screenshots/landing.png)
+![Landing page without public registration](screenshots/landing.png)
 ![Login page for internal users](screenshots/login.png)
 ![Admin dashboard with global CRM stats](screenshots/dashboard.png)
 ![Companies module](screenshots/companies.png)
@@ -163,6 +165,7 @@ PORT=5000
 NODE_ENV=development
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=1d
+CLIENT_URL=http://localhost:5173
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=crm_pro
@@ -174,7 +177,8 @@ DB_CONNECTION_LIMIT=10
 Notes:
 
 - `PORT` defaults to `5000` if not set.
-- `JWT_SECRET` has a development fallback, but a real secret should be set locally.
+- `JWT_SECRET` is required. Set it in `server/.env` before starting the backend.
+- `CLIENT_URL` or `CORS_ORIGIN` can be set to restrict browser access to the Vite client origin.
 - `DB_DATABASE` defaults to `crm_pro`, matching `server/src/database/schema.sql`.
 - The frontend API client defaults to `http://localhost:5000/api`. Set `VITE_API_URL` in the frontend environment to override it.
 - If MySQL is unavailable when the backend starts, the backend logs the connection target and retries until MySQL becomes available.
@@ -189,7 +193,7 @@ Implemented API route groups:
 - `/api/users/assignees` - active assignable users for authenticated CRM users.
 - `/api/companies` - company CRUD with scoped ownership.
 - `/api/customers` - customer CRUD with `created_by` and `assigned_to` scope rules.
-- `/api/contacts` - contact CRUD.
+- `/api/contacts` - contact CRUD scoped through owned companies.
 - `/api/leads` - lead CRUD with ownership and assignment rules.
 - `/api/categories` - category CRUD.
 - `/api/products` - product CRUD with Admin-only writes and active-product read access for Employees.
@@ -202,6 +206,10 @@ Implemented API route groups:
 - `/api/dashboard` - scoped stats, revenue, recent activities.
 
 Most CRM routes are protected by authentication middleware and require a Bearer token. Public registration is intentionally disabled; administrators create user accounts from the Users module.
+
+Order item prices are calculated by the backend from the current product selling price. Client-supplied `unit_price` values are ignored so API requests cannot manipulate order totals.
+
+Inventory stock is currently managed through the inventory endpoints. Automatic stock decrement on order creation or status changes is intentionally left as a limitation until the workflow defines whether stock should be reserved, consumed on confirmation, or consumed on completion.
 
 ## Frontend Pages
 

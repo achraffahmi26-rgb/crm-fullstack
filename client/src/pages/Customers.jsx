@@ -331,7 +331,7 @@ function Customers() {
                   <SortableHeader columnKey="status" onSort={table.toggleSort} sortConfig={table.sortConfig}>Status</SortableHeader>
                   <SortableHeader columnKey="company" onSort={table.toggleSort} sortConfig={table.sortConfig}>Company</SortableHeader>
                   <SortableHeader columnKey="user" onSort={table.toggleSort} sortConfig={table.sortConfig}>Assigned To</SortableHeader>
-                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created At</SortableHeader>
+                  <SortableHeader columnKey="created_at" onSort={table.toggleSort} sortConfig={table.sortConfig}>Created at</SortableHeader>
                   <th className="text-right font-semibold">Actions</th>
                 </tr>
               </thead>

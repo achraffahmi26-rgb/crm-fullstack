@@ -1,4 +1,4 @@
--- CRM Stage initial schema generated from final DBML model
+-- CRM Full-Stack initial schema generated from final DBML model
 CREATE DATABASE IF NOT EXISTS `crm_pro` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `crm_pro`;
 

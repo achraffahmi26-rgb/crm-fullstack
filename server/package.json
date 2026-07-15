@@ -1,7 +1,7 @@
 {
   "name": "crm-stage-server",
   "version": "0.1.0",
-  "description": "Backend foundation for the CRM Stage project.",
+  "description": "Backend foundation for the CRM Full-Stack project.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

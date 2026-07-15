@@ -1,4 +1,4 @@
-# CRM Pro – Project Roadmap
+# CRM Full-Stack – Project Roadmap
 
 ## Overview
 

@@ -1,8 +1,8 @@
-# CRM Pro - System Architecture
+# CRM Full-Stack - System Architecture
 
 ## 1. Architecture Overview
 
-CRM Pro uses a layered full-stack architecture with clear separation between the React frontend, Express API, authentication middleware, controllers, service-layer business logic, and MySQL access through mysql2.
+CRM Full-Stack uses a layered full-stack architecture with clear separation between the React frontend, Express API, authentication middleware, controllers, service-layer business logic, and MySQL access through mysql2.
 
 The architecture is intentionally service-layer driven so role checks, ownership checks, and scoped CRM access rules are enforced on the backend rather than only in the UI.
 
@@ -56,6 +56,7 @@ Main responsibilities:
 - The backend verifies the bcrypt password hash and account status.
 - Inactive users are rejected.
 - On success, the backend issues a JWT.
+- JWT_SECRET is required at startup; the backend has no default secret fallback.
 
 ### Disabled Public Registration
 - Public registration is disabled.
@@ -95,7 +96,9 @@ Admin inherits Employee capabilities and adds administrative privileges.
 - Customers and leads: scoped by `created_by` or `assigned_to`.
 - Orders: scoped by creator or owned/assigned customer.
 - Invoices and payments: scoped through issued orders and customers.
-- Tasks: scoped by `created_by` or `assigned_to`.
+- Tasks: scoped by created_by or ssigned_to.
+- Contacts: scoped through company ownership.
+- Customer and lead company selection: validated against companies available to the current user.
 
 ## 7. Data Architecture
 
@@ -103,6 +106,8 @@ Admin inherits Employee capabilities and adds administrative privileges.
 - Driver: mysql2.
 - Schema source: `server/src/database/schema.sql`.
 - Data access is implemented through services using SQL queries.
+- Order item prices are loaded from database product records and order totals are calculated in the backend service.
+- Inventory stock decrement is not automatic yet; inventory is managed through inventory endpoints.
 - The backend uses the MySQL/mysql2 service-layer architecture documented in this project.
 
 ## 8. Request Lifecycle
@@ -123,4 +128,4 @@ The current system does not include Gmail, SMS, WhatsApp, or customer-facing por
 
 ## 10. Future Scalability
 
-The layered architecture can support future capabilities such as mobile apps, multi-tenant data separation, online payment integrations, or AI-assisted analytics without changing the current access-control model.
+The layered architecture can support future capabilities such as mobile apps, multi-tenant data separation, online payment integrations, or advanced analytics without changing the current access-control model.
